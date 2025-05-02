@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import type { CompositeTypes, Database, TablesInsert, TablesUpdate } from './database.types';
+import type { Database, TablesInsert, TablesUpdate } from './database.types';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));

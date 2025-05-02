@@ -6,6 +6,8 @@ import type { Actions } from './$types';
 import { UserRoleManager, UserRole } from '$lib/role-manager';
 import { zodEnum } from '$lib/utils';
 import type { TablesInsert } from '$lib/database.types';
+import { OAUTH_PROVIDERS } from '$lib/constants';
+import type { Provider } from '@supabase/supabase-js';
 
 const defaultRoles = UserRoleManager.getAllRolesExcept(UserRole.Admin);
 
@@ -31,8 +33,42 @@ const SignUpSchema = z.object({
 });
 
 export const actions: Actions = {
-	signup: async ({ request, locals: { supabase } }) => {
+	signup: async ({ request, locals: { supabase }, url }) => {
 		const form = await superValidate(request, zodAdapter(SignUpSchema));
+
+		const provider = url.searchParams.get('provider') as Provider;
+
+		if (provider) {
+			if (!OAUTH_PROVIDERS.includes(provider)) {
+				return fail(400, {
+					error: 'Provider not supported.'
+				});
+			}
+
+			const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
+				provider: provider,
+				options: {
+					redirectTo: 'http://localhost:5173/auth/callback'
+				}
+			});
+
+			if (oauthError) {
+				console.log('Error logging in via oauth:', oauthError);
+				let errorMessage = 'Something went wrong. Please try again.';
+
+				if (oauthError?.message) {
+					errorMessage = oauthError.message;
+				}
+
+				form.errors = {
+					password: [errorMessage]
+				};
+
+				return fail(400, { form });
+			}
+
+			throw redirect(303, data.url);
+		}
 
 		if (!form.valid) {
 			return fail(400, { form });
@@ -84,6 +120,6 @@ export const actions: Actions = {
 			return fail(400, { form });
 		}
 
-		throw redirect(303, '/private');
+		throw redirect(303, '/auth/check-email?reason=verify-email');
 	}
 };

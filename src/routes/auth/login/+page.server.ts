@@ -3,6 +3,8 @@ import { z } from 'zod';
 import { zod as zodAdapter } from 'sveltekit-superforms/adapters';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
+import type { Provider } from '@supabase/supabase-js';
+import { OAUTH_PROVIDERS } from '$lib/constants';
 
 const LoginSchema = z.object({
 	email: z.string().email({ message: 'Invalid email address' }),
@@ -10,8 +12,41 @@ const LoginSchema = z.object({
 });
 
 export const actions: Actions = {
-	login: async ({ request, locals: { supabase } }) => {
+	login: async ({ request, locals: { supabase }, url }) => {
 		const form = await superValidate(request, zodAdapter(LoginSchema));
+		const provider = url.searchParams.get('provider') as Provider;
+
+		if (provider) {
+			if (!OAUTH_PROVIDERS.includes(provider)) {
+				return fail(400, {
+					error: 'Provider not supported.'
+				});
+			}
+
+			const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
+				provider: provider, 
+				options: {
+					redirectTo: 'http://localhost:5173/auth/callback'
+				}
+			});
+
+			if (oauthError) {
+				console.log('Error logging in via oauth:', oauthError);
+				let errorMessage = 'Something went wrong. Please try again.';
+
+				if (oauthError?.message) {
+					errorMessage = oauthError.message;
+				}
+
+				form.errors = {
+					password: [errorMessage]
+				};
+
+				return fail(400, { form });
+			}
+
+			throw redirect(303, data.url);
+		}
 
 		if (!form.valid) {
 			return fail(400, { form });
@@ -36,6 +71,6 @@ export const actions: Actions = {
 			return fail(400, { form });
 		}
 
-		throw redirect(303, '/tickets');
+		throw redirect(303, '/private/tickets');
 	}
 };

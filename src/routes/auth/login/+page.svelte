@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button';
+	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import {
@@ -10,6 +10,8 @@
 		CardDescription
 	} from '$lib/components/ui/card';
 	import { enhance } from '$app/forms';
+	import { supabase } from '$lib/supabase-client.js';
+	import { cn } from '$lib/utils';
 
 	let { form } = $props();
 
@@ -22,14 +24,13 @@
 	});
 </script>
 
-<form method="POST" use:enhance action="?/login" class="space-y-6">
-	<Card class="mx-auto max-w-sm">
-		<CardHeader>
-			<CardTitle class="text-2xl">Login</CardTitle>
-			<CardDescription>Enter your email and password below to login to your account</CardDescription
-			>
-		</CardHeader>
-		<CardContent class="space-y-4">
+<Card class="mx-auto max-w-sm">
+	<CardHeader>
+		<CardTitle class="text-2xl">Login</CardTitle>
+		<CardDescription>Enter your email and password below to login to your account</CardDescription>
+	</CardHeader>
+	<CardContent class="space-y-4">
+		<form method="POST" use:enhance action="?/login" class="space-y-4">
 			<div class="grid gap-2">
 				<Label for="email">Email</Label>
 				<Input
@@ -57,11 +58,19 @@
 			</div>
 
 			<Button type="submit" class="w-full">Login</Button>
-			<Button variant="outline" class="w-full">Login with Google</Button>
+		</form>
 
-			<div class="mt-4 text-center text-sm">
-				Don't have an account? <a href="/auth/sign-up" class="underline">Sign up</a>
-			</div>
-		</CardContent>
-	</Card>
-</form>
+		<form id="socials" method="POST" use:enhance>
+			<button
+				class={cn(buttonVariants({ variant: 'outline' }), 'w-full')}
+				formaction="?/login&provider=google"
+			>
+				Login with Google
+			</button>
+		</form>
+
+		<div class="mt-4 text-center text-sm">
+			Don't have an account? <a href="/auth/sign-up" class="underline">Sign up</a>
+		</div>
+	</CardContent>
+</Card>

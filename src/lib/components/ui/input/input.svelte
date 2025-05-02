@@ -49,5 +49,10 @@
 		/>
 	{/if}
 	{#if error}
-		<span class="animate-in fade-in-30 slide-in-from-top text-xs text-red-400">{error}</span>{/if}
+		<span class="animate-in fade-in-30 slide-in-from-top flex flex-col gap-1 text-xs text-red-400">
+			{#each error as err}
+				{err}
+			{/each}
+		</span>
+	{/if}
 </div>

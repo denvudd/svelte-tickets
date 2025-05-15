@@ -12,7 +12,7 @@ import type { Provider } from '@supabase/supabase-js';
 const defaultRoles = UserRoleManager.getAllRolesExcept(UserRole.Admin);
 
 const SignUpSchema = z.object({
-	name: z
+	full_name: z
 		.string({
 			required_error: 'Name is required'
 		})
@@ -80,8 +80,6 @@ export const actions: Actions = {
 			email,
 			password
 		});
-		console.log('🚀 ~ signup: ~ signUpData:', signUpData.session);
-		console.log('🚀 ~ signup: ~ signUpData:', signUpData.user);
 
 		if (signUpError || !signUpData.user) {
 			console.error('Error signing up:', signUpError);
@@ -106,8 +104,8 @@ export const actions: Actions = {
 			.from('profiles')
 			.insert<TablesInsert<'profiles'>>({
 				user_id: userId,
-				full_name: form.data.name,
-				role: role
+				full_name: form.data.full_name,
+				role,
 			});
 
 		if (profileError) {

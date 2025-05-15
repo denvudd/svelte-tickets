@@ -44,10 +44,10 @@
 			<div class="grid gap-2">
 				<Label for="email">Name</Label>
 				<Input
-					id="name"
-					name="name"
-					aria-invalid={errors.name ? 'true' : undefined}
-					error={errors.name}
+					id="full_name"
+					name="full_name"
+					aria-invalid={errors.full_name ? 'true' : undefined}
+					error={errors.full_name}
 				/>
 			</div>
 

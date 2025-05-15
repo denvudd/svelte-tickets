@@ -22,7 +22,7 @@
 	}
 
 	const { profile, handleLogout }: Props = $props();
-	const { full_name, avatar_url } = profile;
+	const { full_name, avatar_url } = $derived(profile);
 
 	const avatarShortcut = full_name?.slice(0, 2).toUpperCase();
 </script>
@@ -39,24 +39,30 @@
 			<DropdownMenuGroupHeading>My Account</DropdownMenuGroupHeading>
 			<DropdownMenuSeparator />
 			<DropdownMenuGroup>
-				<DropdownMenuItem>
-					<UserIcon class="size-4" />
-					<span>Profile</span>
-					<DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-				</DropdownMenuItem>
-				<DropdownMenuItem>
-					<SettingsIcon class="size-4" />
-					<span>Settings</span>
-					<DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-				</DropdownMenuItem>
+				<a href="/private/account/profile">
+					<DropdownMenuItem>
+						<UserIcon class="size-4" />
+						<span>Profile</span>
+						<DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+					</DropdownMenuItem>
+				</a>
+				<a href="/private/account/settings">
+					<DropdownMenuItem>
+						<SettingsIcon class="size-4" />
+						<span>Settings</span>
+						<DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
+					</DropdownMenuItem>
+				</a>
 			</DropdownMenuGroup>
 			<DropdownMenuSeparator />
 			<DropdownMenuGroup>
-				<DropdownMenuItem>
-					<MessageSquareIcon class="size-4" />
-					<span>Messages</span>
-					<DropdownMenuShortcut>⌘+M</DropdownMenuShortcut>
-				</DropdownMenuItem>
+				<a href="/private/messages">
+					<DropdownMenuItem>
+						<MessageSquareIcon class="size-4" />
+						<span>Messages</span>
+						<DropdownMenuShortcut>⌘+M</DropdownMenuShortcut>
+					</DropdownMenuItem>
+				</a>
 			</DropdownMenuGroup>
 			<DropdownMenuSeparator />
 			<DropdownMenuItem onclick={handleLogout}>

@@ -4,20 +4,21 @@
 	import { i18n } from '$lib/i18n';
 	import { goto, invalidate } from '$app/navigation';
 	import { ModeWatcher } from 'mode-watcher';
-	import '../app.css';
 	import Header from '$lib/components/layout/header.svelte';
+	import '../app.css';
+	import { Toaster } from '$lib/components/ui/sonner';
 
 	let { data, children } = $props();
 	let { session, supabase, profile } = $derived(data);
 
 	onMount(() => {
-		const { data } = supabase.auth.onAuthStateChange((authEvent, newSession) => {
+		const { data: authStateListener } = supabase.auth.onAuthStateChange((authEvent, newSession) => {
 			if (newSession?.expires_at !== session?.expires_at) {
 				invalidate('supabase:auth');
 			}
 		});
 
-		return () => data.subscription.unsubscribe();
+		return () => authStateListener.subscription.unsubscribe();
 	});
 
 	const handleLogout = async () => {
@@ -34,6 +35,7 @@
 
 <ParaglideJS {i18n}>
 	<ModeWatcher />
+	<Toaster />
 	<Header {handleLogout} {profile} />
 	{@render children()}
 </ParaglideJS>

@@ -1,14 +1,14 @@
 <script lang="ts">
 	import ColorThemeToggle from '$lib/components/color-theme-toggle.svelte';
-	import type { Tables } from '$lib/database.types';
 	import HeaderProfileDropdown from './header-profile-dropdown.svelte';
+	import type { Tables } from '$lib/database.types';
 
 	interface Props {
-		profile: Tables<'profiles'> | null;
 		handleLogout: () => Promise<void>;
+		profile: Tables<'profiles'> | null;
 	}
 
-	let { profile, handleLogout }: Props = $props();
+	let { handleLogout, profile }: Props = $props();
 </script>
 
 <header class="border-accent w-full border-b py-4">

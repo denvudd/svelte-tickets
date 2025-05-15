@@ -8,6 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 
 export const zodEnum = <T>(arr: T[]): [T, ...T[]] => arr as [T, ...T[]];
 
+
 type DefaultSchema = Database[Extract<keyof Database, 'public'>];
 
 type TableKeys = keyof DefaultSchema['Tables'];

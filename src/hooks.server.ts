@@ -30,12 +30,16 @@ const supabaseInit: Handle = async ({ event, resolve }) => {
 		const {
 			data: { session }
 		} = await event.locals.supabase.auth.getSession();
+
 		if (!session) return { session: null, user: null };
+
 		const {
 			data: { user },
 			error
 		} = await event.locals.supabase.auth.getUser();
+
 		if (error) return { session: null, user: null };
+
 		return { session, user };
 	};
 
@@ -63,9 +67,11 @@ const authGuard: Handle = async ({ event, resolve }) => {
 
 	const profile: PostgrestSingleResponse<Tables<'profiles'>> = await event.locals.supabase
 		.from('profiles')
-		.select('full_name, role')
+		.select('*')
 		.eq('user_id', user?.id)
 		.single();
+
+	event.locals.profile = profile.data;
 
 	if (
 		session &&

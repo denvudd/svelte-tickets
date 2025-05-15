@@ -54,6 +54,7 @@ export type Database = {
           created_at: string | null
           full_name: string | null
           id: string
+          occupation: string | null
           role: Database["public"]["Enums"]["user_role"]
           updated_at: string | null
           user_id: string | null
@@ -63,6 +64,7 @@ export type Database = {
           created_at?: string | null
           full_name?: string | null
           id?: string
+          occupation?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string | null
           user_id?: string | null
@@ -72,11 +74,47 @@ export type Database = {
           created_at?: string | null
           full_name?: string | null
           id?: string
+          occupation?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string | null
           user_id?: string | null
         }
         Relationships: []
+      }
+      projects: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: number
+          name: string
+          owner_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: number
+          name: string
+          owner_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: number
+          name?: string
+          owner_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projects_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tickets: {
         Row: {
@@ -87,6 +125,7 @@ export type Database = {
           id: number
           owner_id: string
           priority: Database["public"]["Enums"]["ticket_priority"]
+          project_id: number | null
           status: Database["public"]["Enums"]["ticket_status"]
           title: string
           updated_at: string | null
@@ -99,6 +138,7 @@ export type Database = {
           id?: number
           owner_id: string
           priority?: Database["public"]["Enums"]["ticket_priority"]
+          project_id?: number | null
           status?: Database["public"]["Enums"]["ticket_status"]
           title: string
           updated_at?: string | null
@@ -111,6 +151,7 @@ export type Database = {
           id?: number
           owner_id?: string
           priority?: Database["public"]["Enums"]["ticket_priority"]
+          project_id?: number | null
           status?: Database["public"]["Enums"]["ticket_status"]
           title?: string
           updated_at?: string | null
@@ -128,6 +169,13 @@ export type Database = {
             columns: ["owner_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tickets_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]

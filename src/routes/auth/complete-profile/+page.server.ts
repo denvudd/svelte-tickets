@@ -8,7 +8,9 @@ import { zodEnum } from '$lib/utils';
 
 const CompleteProfileSchema = z.object({
 	name: z.string().min(2, { message: 'Name must be at least 2 characters' }),
-	role: z.enum(zodEnum(UserRoleManager.getAllRolesExcept(UserRole.Admin)))
+	role: z.enum(zodEnum(UserRoleManager.getAllRolesExcept(UserRole.Admin)), {
+		errorMap: () => ({ message: 'Please select a role' })
+	})
 });
 
 export const actions: Actions = {

@@ -23,7 +23,7 @@
 		},
 		defaultVariants: {
 			variant: 'default',
-			size: 'default'
+			size: 'sm'
 		}
 	});
 
@@ -43,7 +43,7 @@
 	let {
 		class: className,
 		variant = 'default',
-		size = 'default',
+		size = 'sm',
 		ref = $bindable(null),
 		href = undefined,
 		type = 'button',

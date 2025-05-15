@@ -1,5 +1,4 @@
 import { message, superValidate, withFiles } from 'sveltekit-superforms';
-
 import { zod as zodAdapter } from 'sveltekit-superforms/adapters';
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
@@ -47,7 +46,6 @@ export const actions: Actions = {
 			occupation: form.data.occupation,
 			...(avatar_url ? { avatar_url } : {})
 		};
-		console.log('🚀 ~ default: ~ payload:', payload);
 
 		const { error: updateError } = await updateProfile(supabase, profile.id, payload);
 

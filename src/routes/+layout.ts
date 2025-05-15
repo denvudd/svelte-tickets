@@ -34,14 +34,11 @@ export const load: LayoutLoad = async ({ data, depends, fetch }) => {
 	let profile: Tables<'profiles'> | null = null;
 
 	if (session && user) {
-		console.log('run');
-
 		const { data: profileData } = await supabase
 			.from('profiles')
 			.select('*')
 			.eq('user_id', user.id)
 			.single();
-		console.log('🚀 ~ constload:LayoutLoad= ~ profileData:', profileData);
 		profile = profileData;
 	}
 

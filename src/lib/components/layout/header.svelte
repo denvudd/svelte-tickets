@@ -16,7 +16,12 @@
 		<div class="flex items-center gap-4">
 			<ColorThemeToggle />
 			{#if profile}
-				<HeaderProfileDropdown {handleLogout} {profile} />
+				<div class="flex items-center gap-2">
+					{#if profile.full_name}
+						<span class="">{profile.full_name}</span>
+					{/if}
+					<HeaderProfileDropdown {handleLogout} {profile} />
+				</div>
 			{:else}
 				<nav>
 					<ul class="flex items-center gap-4">

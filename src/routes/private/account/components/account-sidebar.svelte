@@ -9,9 +9,13 @@
 			href: '/private/account/profile'
 		},
 		{
-			label: 'Settings',
+			label: 'Account',
 			href: '/private/account/settings'
-		}
+		},
+		{
+			label: 'Appearance',
+			href: '/private/account/appearance'
+		},
 	];
 
 	const isParamMatch = (href: string) => href === $page.url.pathname;
@@ -29,7 +33,7 @@
 
 <Card class="h-full w-full max-w-full">
 	<CardHeader>
-		<CardTitle>My Account</CardTitle>
+		<CardTitle>Settings</CardTitle>
 	</CardHeader>
 	<CardContent>
 		<nav>

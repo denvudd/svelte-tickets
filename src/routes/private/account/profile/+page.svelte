@@ -56,7 +56,7 @@
 
 <Card class="mx-auto w-full max-w-full">
 	<CardHeader>
-		<CardTitle>Profile Settings</CardTitle>
+		<CardTitle>Profile</CardTitle>
 		<CardDescription>Update your personal information</CardDescription>
 	</CardHeader>
 
@@ -103,17 +103,18 @@
 					required
 					bind:value={$form.full_name}
 					aria-invalid={$errors.full_name ? 'true' : undefined}
+					error={$errors.full_name}
 				/>
-				{#if $errors.full_name}
-					<p class="text-destructive text-sm">{$errors.full_name}</p>
-				{/if}
 			</div>
 
 			<div class="space-y-2">
-				<Label for="email" class="flex items-center gap-2">
-					<MailIcon class="h-4 w-4" />
-					Email
-				</Label>
+				<div class="flex items-center">
+					<Label for="email" class="flex items-center gap-2">
+						<MailIcon class="h-4 w-4" />
+						Email
+					</Label>
+					<a href="/private/account/settings#email-management" class="ml-auto inline-block text-sm underline">Want to change it?</a>
+				</div>
 				<Input id="email" value={user?.email} disabled />
 			</div>
 
@@ -128,10 +129,8 @@
 					placeholder="Enter your occupation"
 					bind:value={$form.occupation}
 					aria-invalid={$errors.occupation ? 'true' : undefined}
+					error={$errors.occupation}
 				/>
-				{#if $errors.occupation}
-					<p class="text-destructive text-sm">{$errors.occupation}</p>
-				{/if}
 			</div>
 		</CardContent>
 

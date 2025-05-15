@@ -29,7 +29,7 @@
 			return;
 		}
 
-		goto('/auth/login');
+		goto(ROUTES.auth.login);
 	};
 </script>
 

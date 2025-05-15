@@ -20,6 +20,7 @@
 		TooltipTrigger
 	} from '$lib/components/ui/tooltip/index.js';
 	import { cn } from '$lib/utils.js';
+	import { ROUTES } from '$lib/routes.js';
 
 	let { form } = $props();
 
@@ -115,7 +116,7 @@
 			</button>
 		</form>
 		<div class="mt-4 text-center text-sm">
-			Already have an account? <a href="/auth/login" class="underline">Login</a>
+			Already have an account? <a href={ROUTES.auth.login} class="underline">Login</a>
 		</div>
 	</CardContent>
 </Card>

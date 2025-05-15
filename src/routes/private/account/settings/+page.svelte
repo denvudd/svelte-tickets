@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button';
 	import {
 		Card,
 		CardHeader,
@@ -9,9 +8,9 @@
 		CardFooter
 	} from '$lib/components/ui/card';
 	import type { PageData } from './$types';
-	import PasswordManagementForm from './components/password-management-form.svelte';
-	import EmailManagementForm from './components/email-management-form.svelte';
-	import DeleteAccountForm from './components/delete-account-form.svelte';
+	import PasswordManagementForm from './_components/password-management-form.svelte';
+	import EmailManagementForm from './_components/email-management-form.svelte';
+	import DeleteAccountForm from './_components/delete-account-form.svelte';
 	import { Separator } from '$lib/components/ui/separator';
 
 	let { data }: { data: PageData } = $props();

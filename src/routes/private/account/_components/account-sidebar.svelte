@@ -2,20 +2,21 @@
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
 	import { page } from '$app/stores';
 	import { cn } from '$lib/utils';
+	import { ROUTES } from '$lib/routes';
 
 	const NAVIGATION_OPTIONS = [
 		{
 			label: 'Profile',
-			href: '/private/account/profile'
+			href: ROUTES.private.account.profile
 		},
 		{
 			label: 'Account',
-			href: '/private/account/settings'
+			href: ROUTES.private.account.settings
 		},
 		{
 			label: 'Appearance',
-			href: '/private/account/appearance'
-		},
+			href: ROUTES.private.account.appearence
+		}
 	];
 
 	const isParamMatch = (href: string) => href === $page.url.pathname;

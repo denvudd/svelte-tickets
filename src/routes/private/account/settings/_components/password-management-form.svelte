@@ -7,6 +7,7 @@
 	import { Label } from '$lib/components/ui/label';
 	import { Input } from '$lib/components/ui/input';
 	import { Button } from '$lib/components/ui/button';
+	import { ROUTES } from '$lib/routes';
 
 	interface Props {
 		passwordForm: SuperValidated<Infer<typeof PasswordManagementSchema>>;
@@ -45,7 +46,9 @@
 				aria-invalid={$tainted?.current_password && $errors.current_password ? 'true' : undefined}
 				error={$tainted?.current_password && $errors.current_password}
 			/>
-            <a class="ml-auto inline-block text-sm underline" href="/auth/forgot-password">Forgot your password?</a>
+			<a class="ml-auto inline-block text-sm underline" href={ROUTES.auth.forgotPassword}
+				>Forgot your password?</a
+			>
 		</div>
 		<div class="grid gap-2">
 			<Label for="new_password">New Password</Label>

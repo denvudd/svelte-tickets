@@ -5,9 +5,10 @@ import type { PageServerLoad, Actions } from './$types';
 import { updateProfile, uploadProfileAvatar } from '$lib/db/profile';
 import { ProfileSchema } from './schema';
 import type { TablesUpdate } from '$lib/database.types';
+import { ROUTES } from '$lib/routes';
 
 export const load: PageServerLoad = async ({ locals: { session, profile } }) => {
-	if (!session || !profile) throw redirect(303, '/auth/login');
+	if (!session || !profile) throw redirect(303, ROUTES.auth.login);
 
 	const form = await superValidate(
 		{

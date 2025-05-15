@@ -5,6 +5,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 import type { Provider } from '@supabase/supabase-js';
 import { OAUTH_PROVIDERS } from '$lib/constants';
+import { ROUTES } from '$lib/routes';
 
 const LoginSchema = z.object({
 	email: z.string().email({ message: 'Invalid email address' }),
@@ -71,6 +72,6 @@ export const actions: Actions = {
 			return fail(400, { form });
 		}
 
-		throw redirect(303, '/private/tickets');
+		throw redirect(303, ROUTES.private.tickets);
 	}
 };

@@ -2,6 +2,7 @@
 	import LogOutIcon from '@lucide/svelte/icons/log-out';
 	import MessageSquareIcon from '@lucide/svelte/icons/message-square';
 	import SettingsIcon from '@lucide/svelte/icons/settings';
+	import PaintbrushIcon from '@lucide/svelte/icons/paintbrush';
 	import UserIcon from '@lucide/svelte/icons/user';
 	import {
 		DropdownMenu,
@@ -15,6 +16,7 @@
 	} from '$lib/components/ui/dropdown-menu';
 	import { Avatar, AvatarImage, AvatarFallback } from '$lib/components/ui/avatar';
 	import type { Tables } from '$lib/database.types';
+	import { ROUTES } from '$lib/routes';
 
 	interface Props {
 		profile: Tables<'profiles'>;
@@ -39,28 +41,35 @@
 			<DropdownMenuGroupHeading>My Account</DropdownMenuGroupHeading>
 			<DropdownMenuSeparator />
 			<DropdownMenuGroup>
-				<a href="/private/account/profile">
+				<a href={ROUTES.private.account.profile}>
 					<DropdownMenuItem>
 						<UserIcon class="size-4" />
 						<span>Profile</span>
 						<DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
 					</DropdownMenuItem>
 				</a>
-				<a href="/private/account/settings">
+				<a href={ROUTES.private.account.settings}>
 					<DropdownMenuItem>
 						<SettingsIcon class="size-4" />
 						<span>Settings</span>
 						<DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
 					</DropdownMenuItem>
 				</a>
+				<a href={ROUTES.private.account.appearence}>
+					<DropdownMenuItem>
+						<PaintbrushIcon class="size-4" />
+						<span>Appearance</span>
+						<DropdownMenuShortcut>⌘A</DropdownMenuShortcut>
+					</DropdownMenuItem>
+				</a>
 			</DropdownMenuGroup>
 			<DropdownMenuSeparator />
 			<DropdownMenuGroup>
-				<a href="/private/messages">
+				<a href={ROUTES.private.messages}>
 					<DropdownMenuItem>
 						<MessageSquareIcon class="size-4" />
 						<span>Messages</span>
-						<DropdownMenuShortcut>⌘+M</DropdownMenuShortcut>
+						<DropdownMenuShortcut>⌘M</DropdownMenuShortcut>
 					</DropdownMenuItem>
 				</a>
 			</DropdownMenuGroup>

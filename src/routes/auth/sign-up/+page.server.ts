@@ -8,6 +8,7 @@ import { zodEnum } from '$lib/utils';
 import type { TablesInsert } from '$lib/database.types';
 import { OAUTH_PROVIDERS } from '$lib/constants';
 import type { Provider } from '@supabase/supabase-js';
+import { ROUTES } from '$lib/routes';
 
 const defaultRoles = UserRoleManager.getAllRolesExcept(UserRole.Admin);
 
@@ -118,6 +119,6 @@ export const actions: Actions = {
 			return fail(400, { form });
 		}
 
-		throw redirect(303, '/auth/check-email?reason=verify-email');
+		throw redirect(303, `${ROUTES.auth.checkEmail}?reason=verify-email`);
 	}
 };

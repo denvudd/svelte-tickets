@@ -1,5 +1,5 @@
 <script>
-	import AccountSidebar from './components/account-sidebar.svelte';
+	import AccountSidebar from './_components/account-sidebar.svelte';
 
 	let { children } = $props();
 </script>

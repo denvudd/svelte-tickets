@@ -5,6 +5,7 @@ import { i18n } from '$lib/i18n';
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
 import type { Database, Tables } from '$lib/database.types';
 import type { PostgrestSingleResponse } from '@supabase/supabase-js';
+import { ROUTES } from '$lib/routes';
 
 /**
  * Supabase init hook: creates a server client per request
@@ -58,11 +59,11 @@ const authGuard: Handle = async ({ event, resolve }) => {
 	event.locals.user = user;
 
 	if (!session && event.url.pathname.startsWith('/private')) {
-		throw redirect(303, '/auth/login');
+		throw redirect(303, ROUTES.auth.login);
 	}
 
-	if (session && event.url.pathname === '/auth/login') {
-		throw redirect(303, '/private/tickets');
+	if (session && event.url.pathname === ROUTES.auth.login) {
+		throw redirect(303, ROUTES.private.tickets);
 	}
 
 	const profile: PostgrestSingleResponse<Tables<'profiles'>> = await event.locals.supabase
@@ -75,10 +76,10 @@ const authGuard: Handle = async ({ event, resolve }) => {
 
 	if (
 		session &&
-		event.url.pathname !== '/auth/complete-profile' &&
+		event.url.pathname !== ROUTES.auth.completeProfile &&
 		(!profile.data?.full_name || !profile.data?.role)
 	) {
-		throw redirect(303, '/auth/complete-profile');
+		throw redirect(303, ROUTES.auth.completeProfile);
 	}
 
 	return resolve(event);

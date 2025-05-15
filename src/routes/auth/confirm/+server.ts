@@ -2,6 +2,7 @@ import type { EmailOtpType } from '@supabase/supabase-js';
 import { redirect } from '@sveltejs/kit';
 
 import type { RequestHandler } from './$types';
+import { ROUTES } from '$lib/routes';
 
 export const GET: RequestHandler = async ({ url, locals: { supabase } }) => {
 	const token_hash = url.searchParams.get('token_hash');
@@ -23,6 +24,6 @@ export const GET: RequestHandler = async ({ url, locals: { supabase } }) => {
 		}
 	}
 
-	redirectTo.pathname = '/auth/error';
+	redirectTo.pathname = ROUTES.auth.error;
 	redirect(303, redirectTo);
 };

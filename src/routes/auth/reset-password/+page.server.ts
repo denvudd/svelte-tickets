@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { zod as zodAdapter } from 'sveltekit-superforms/adapters';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
+import { ROUTES } from '$lib/routes';
 
 const ResetPasswordSchema = z
 	.object({
@@ -41,6 +42,6 @@ export const actions: Actions = {
 			return fail(400, { form });
 		}
 
-		throw redirect(303, '/private/tickets');
+		throw redirect(303, ROUTES.private.tickets);
 	}
 };

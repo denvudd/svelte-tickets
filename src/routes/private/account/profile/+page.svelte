@@ -21,6 +21,7 @@
 	import BriefcaseIcon from '@lucide/svelte/icons/briefcase';
 	import { invalidate } from '$app/navigation';
 	import type { PageProps } from './$types';
+	import { ROUTES } from '$lib/routes';
 
 	let { data }: PageProps = $props();
 	let { user, profile, form: loadedForm } = $state(data);
@@ -113,7 +114,10 @@
 						<MailIcon class="h-4 w-4" />
 						Email
 					</Label>
-					<a href="/private/account/settings#email-management" class="ml-auto inline-block text-sm underline">Want to change it?</a>
+					<a
+						href={`${ROUTES.private.account.settings}#email-management`}
+						class="ml-auto inline-block text-sm underline">Want to change it?</a
+					>
 				</div>
 				<Input id="email" value={user?.email} disabled />
 			</div>

@@ -12,6 +12,7 @@
 	import { enhance } from '$app/forms';
 	import { supabase } from '$lib/supabase-client.js';
 	import { cn } from '$lib/utils';
+	import { ROUTES } from '$lib/routes.js';
 
 	let { form } = $props();
 
@@ -44,7 +45,7 @@
 			<div class="grid gap-2">
 				<div class="flex items-center">
 					<Label for="password">Password</Label>
-					<a href="/auth/forgot-password" class="ml-auto inline-block text-sm underline"
+					<a href={ROUTES.auth.forgotPassword} class="ml-auto inline-block text-sm underline"
 						>Forgot your password?</a
 					>
 				</div>
@@ -70,7 +71,7 @@
 		</form>
 
 		<div class="mt-4 text-center text-sm">
-			Don't have an account? <a href="/auth/sign-up" class="underline">Sign up</a>
+			Don't have an account? <a href={ROUTES.auth.signUp} class="underline">Sign up</a>
 		</div>
 	</CardContent>
 </Card>

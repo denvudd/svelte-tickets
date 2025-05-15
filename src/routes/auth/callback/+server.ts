@@ -1,3 +1,4 @@
+import { ROUTES } from '$lib/routes.js';
 import { redirect } from '@sveltejs/kit';
 
 export const GET = async ({ url, locals: { supabase } }) => {
@@ -8,7 +9,7 @@ export const GET = async ({ url, locals: { supabase } }) => {
 
 		if (error) {
 			console.error('OAuth callback error:', error.message);
-			throw redirect(303, '/auth/error');
+			throw redirect(303, ROUTES.auth.error);
 		}
 	}
 
@@ -17,7 +18,7 @@ export const GET = async ({ url, locals: { supabase } }) => {
 	} = await supabase.auth.getUser();
 
 	if (!user) {
-		throw redirect(303, '/auth/login');
+		throw redirect(303, ROUTES.auth.login);
 	}
 
 	const { data: profile } = await supabase
@@ -27,8 +28,8 @@ export const GET = async ({ url, locals: { supabase } }) => {
 		.single();
 
 	if (!profile) {
-		throw redirect(303, '/auth/complete-profile');
+		throw redirect(303, ROUTES.auth.completeProfile);
 	}
 
-	throw redirect(303, '/private/tickets');
+	throw redirect(303, ROUTES.private.tickets);
 };

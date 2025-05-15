@@ -2,7 +2,7 @@
 	import { Card, CardDescription, CardHeader, CardTitle } from '$lib/components/ui/card';
 	import type { PageData } from './$types';
 
-	const { data }: {data: PageData} = $props();
+	const { data }: { data: PageData } = $props();
 	const { reason } = $derived(data);
 
 	const renderReasonLabel = () => {

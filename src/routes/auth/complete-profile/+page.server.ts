@@ -5,6 +5,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 import { UserRoleManager, UserRole } from '$lib/role-manager';
 import { zodEnum } from '$lib/utils';
+import { ROUTES } from '$lib/routes';
 
 const CompleteProfileSchema = z.object({
 	name: z.string().min(2, { message: 'Name must be at least 2 characters' }),
@@ -26,7 +27,7 @@ export const actions: Actions = {
 		} = await supabase.auth.getUser();
 
 		if (!user) {
-			throw redirect(303, '/auth/login');
+			throw redirect(303, ROUTES.auth.login);
 		}
 
 		const { error } = await supabase.from('profiles').insert({
@@ -40,6 +41,6 @@ export const actions: Actions = {
 			return fail(500, { form });
 		}
 
-		throw redirect(303, '/private/tickets');
+		throw redirect(303, ROUTES.private.tickets);
 	}
 };

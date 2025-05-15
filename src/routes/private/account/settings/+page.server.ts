@@ -7,9 +7,10 @@ import { PUBLIC_SUPABASE_URL } from '$env/static/public';
 import { SUPABASE_SERVICE_ROLE_KEY } from '$env/static/private';
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '$lib/database.types';
+import { ROUTES } from '$lib/routes';
 
 export const load: PageServerLoad = async ({ locals: { session } }) => {
-	if (!session) throw redirect(303, '/auth/login');
+	if (!session) throw redirect(401, ROUTES.auth.login);
 
 	const passwordForm = await superValidate(
 		{
@@ -34,7 +35,7 @@ export const actions: Actions = {
 		const form = await superValidate(request, zodAdapter(PasswordManagementSchema));
 
 		if (!form.valid) return fail(400, { form });
-		if (!session || !user) throw error(401, 'Unauthorized');
+		if (!session || !user) throw redirect(401, ROUTES.auth.login);
 
 		const { error: authError } = await supabase.auth.signInWithPassword({
 			email: user.email!,
@@ -62,14 +63,14 @@ export const actions: Actions = {
 		const form = await superValidate(request, zodAdapter(EmailManagementSchema));
 
 		if (!form.valid) return fail(400, { form });
-		if (!session || !user) throw error(401, 'Unauthorized');
+		if (!session || !user) throw redirect(401, ROUTES.auth.login);
 
 		const { error: updateError } = await supabase.auth.updateUser(
 			{
 				email: form.data.new_email
 			},
 			{
-				emailRedirectTo: 'http://localhost:5173/auth/email-changing'
+				emailRedirectTo: `http://localhost:5173${ROUTES.auth.emailChanging}`
 			}
 		);
 
@@ -82,17 +83,16 @@ export const actions: Actions = {
 	},
 
 	deleteAccount: async ({ locals: { session, user } }) => {
-		if (!session || !user) throw error(401, 'Unauthorized');
+		if (!session || !user) throw redirect(401, ROUTES.auth.login);
 
 		const adminSupabase = createClient<Database>(PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 		const { error: deleteError } = await adminSupabase.auth.admin.deleteUser(user.id, false);
 
 		if (deleteError) {
-			console.log('🚀 ~ deleteAccount: ~ deleteError:', deleteError);
 			throw error(500, 'Failed to delete account. Please, try again later');
 		}
 
-		redirect(303, '/auth/login');
+		redirect(303, ROUTES.auth.login);
 	}
 };

@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { zod as zodAdapter } from 'sveltekit-superforms/adapters';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
-import { ROUTES } from '$lib/routes';
+import { ROUTES } from '$lib/constants';
 
 const ForgotPasswordSchema = z.object({
 	email: z.string().email({ message: 'Invalid email address' })

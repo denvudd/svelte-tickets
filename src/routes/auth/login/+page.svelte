@@ -12,7 +12,7 @@
 	import { enhance } from '$app/forms';
 	import { supabase } from '$lib/supabase-client.js';
 	import { cn } from '$lib/utils';
-	import { ROUTES } from '$lib/routes.js';
+	import { ROUTES } from '$lib/constants.js';
 
 	let { form } = $props();
 

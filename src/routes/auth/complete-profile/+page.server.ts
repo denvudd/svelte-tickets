@@ -5,7 +5,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 import { UserRoleManager, UserRole } from '$lib/role-manager';
 import { zodEnum } from '$lib/utils';
-import { ROUTES } from '$lib/routes';
+import { ROUTES } from '$lib/constants';
 
 const CompleteProfileSchema = z.object({
 	name: z.string().min(2, { message: 'Name must be at least 2 characters' }),

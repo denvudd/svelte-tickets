@@ -13,7 +13,6 @@
 		AlertDialogFooter,
 		AlertDialogHeader,
 		AlertDialogTitle,
-		AlertDialogTrigger
 	} from '$lib/components/ui/alert-dialog';
 
 	let isAlertDialogOpen = $state(false);

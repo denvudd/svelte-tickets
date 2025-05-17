@@ -7,11 +7,9 @@ import { PUBLIC_SUPABASE_URL } from '$env/static/public';
 import { SUPABASE_SERVICE_ROLE_KEY } from '$env/static/private';
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '$lib/database.types';
-import { ROUTES } from '$lib/routes';
+import { ROUTES } from '$lib/constants';
 
-export const load: PageServerLoad = async ({ locals: { session } }) => {
-	if (!session) throw redirect(401, ROUTES.auth.login);
-
+export const load: PageServerLoad = async () => {
 	const passwordForm = await superValidate(
 		{
 			new_password: '',

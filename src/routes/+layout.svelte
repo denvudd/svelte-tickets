@@ -7,6 +7,7 @@
 	import Header from '$lib/components/layout/header.svelte';
 	import '../app.css';
 	import { Toaster } from '$lib/components/ui/sonner';
+	import { ROUTES } from '$lib/constants';
 
 	let { data, children } = $props();
 	let { session, supabase, profile } = $derived(data);
@@ -35,7 +36,7 @@
 
 <ParaglideJS {i18n}>
 	<ModeWatcher />
-	<Toaster />
+	<Toaster closeButton richColors />
 	<Header {handleLogout} {profile} />
 	{@render children()}
 </ParaglideJS>

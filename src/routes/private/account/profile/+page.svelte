@@ -21,7 +21,7 @@
 	import BriefcaseIcon from '@lucide/svelte/icons/briefcase';
 	import { invalidate } from '$app/navigation';
 	import type { PageProps } from './$types';
-	import { ROUTES } from '$lib/routes';
+	import { ROUTES } from '$lib/constants';
 
 	let { data }: PageProps = $props();
 	let { user, profile, form: loadedForm } = $state(data);

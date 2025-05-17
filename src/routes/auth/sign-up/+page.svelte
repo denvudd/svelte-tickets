@@ -20,7 +20,7 @@
 		TooltipTrigger
 	} from '$lib/components/ui/tooltip/index.js';
 	import { cn } from '$lib/utils.js';
-	import { ROUTES } from '$lib/routes.js';
+	import { ROUTES } from '$lib/constants.js';
 
 	let { form } = $props();
 

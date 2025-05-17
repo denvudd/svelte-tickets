@@ -35,6 +35,7 @@
 		"svelte": "^5.0.0",
 		"svelte-check": "^4.0.0",
 		"svelte-sonner": "^1.0.1",
+		"sveltekit-search-params": "^3.0.0",
 		"sveltekit-superforms": "^2.24.1",
 		"tailwind-merge": "^3.2.0",
 		"tailwind-variants": "^1.0.0",
@@ -48,6 +49,8 @@
 		"@inlang/paraglide-sveltekit": "^0.15.5",
 		"@supabase/ssr": "^0.6.1",
 		"@supabase/supabase-js": "^2.49.1",
+		"@tanstack/table-core": "^8.21.3",
+		"dayjs": "^1.11.13",
 		"nanoid": "^5.1.5",
 		"zod": "^3.24.3"
 	}

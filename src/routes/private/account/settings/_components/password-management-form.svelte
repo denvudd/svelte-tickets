@@ -7,7 +7,7 @@
 	import { Label } from '$lib/components/ui/label';
 	import { Input } from '$lib/components/ui/input';
 	import { Button } from '$lib/components/ui/button';
-	import { ROUTES } from '$lib/routes';
+	import { ROUTES } from '$lib/constants';
 
 	interface Props {
 		passwordForm: SuperValidated<Infer<typeof PasswordManagementSchema>>;

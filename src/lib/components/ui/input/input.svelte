@@ -12,6 +12,7 @@
 			({ type: 'file'; files?: FileList } | { type?: InputType; files?: undefined })
 	> & {
 		error?: string[] | false | null;
+		rootClass?: string;
 	};
 
 	let {
@@ -21,6 +22,7 @@
 		files = $bindable(),
 		class: className,
 		error,
+		rootClass,
 		...restProps
 	}: Props = $props();
 
@@ -28,7 +30,7 @@
 	let inputType = $derived(type === 'password' ? (showPassword ? 'text' : 'password') : type)
 </script>
 
-<div class="flex w-full flex-col gap-1.5">
+<div class={cn("flex w-full flex-col gap-1.5", rootClass)}>
 	{#if type === 'file'}
 		<input
 			bind:this={ref}

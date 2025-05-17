@@ -8,7 +8,7 @@ import { zodEnum } from '$lib/utils';
 import type { TablesInsert } from '$lib/database.types';
 import { OAUTH_PROVIDERS } from '$lib/constants';
 import type { Provider } from '@supabase/supabase-js';
-import { ROUTES } from '$lib/routes';
+import { ROUTES } from '$lib/constants';
 
 const defaultRoles = UserRoleManager.getAllRolesExcept(UserRole.Admin);
 

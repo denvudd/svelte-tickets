@@ -5,7 +5,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 import type { Provider } from '@supabase/supabase-js';
 import { OAUTH_PROVIDERS } from '$lib/constants';
-import { ROUTES } from '$lib/routes';
+import { ROUTES } from '$lib/constants';
 
 const LoginSchema = z.object({
 	email: z.string().email({ message: 'Invalid email address' }),

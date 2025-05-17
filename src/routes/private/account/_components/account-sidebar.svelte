@@ -2,7 +2,7 @@
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
 	import { page } from '$app/stores';
 	import { cn } from '$lib/utils';
-	import { ROUTES } from '$lib/routes';
+	import { ROUTES } from '$lib/constants';
 
 	const NAVIGATION_OPTIONS = [
 		{

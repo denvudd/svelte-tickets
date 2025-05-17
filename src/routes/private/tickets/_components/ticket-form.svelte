@@ -1,0 +1,228 @@
+<script lang="ts">
+	import { Button, buttonVariants } from '$lib/components/ui/button';
+	import {
+		Dialog,
+		DialogClose,
+		DialogContent,
+		DialogHeader,
+		DialogTitle,
+		DialogTrigger
+	} from '$lib/components/ui/dialog';
+	import DialogDescription from '$lib/components/ui/dialog/dialog-description.svelte';
+	import PlusIcon from '@lucide/svelte/icons/plus';
+	import {
+		superForm,
+		type Infer,
+		type SuperFormSnapshot,
+		type SuperValidated
+	} from 'sveltekit-superforms';
+	import { type CreateTicketSchemaType, CreateTicketSchema } from '../schema';
+	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { Label } from '$lib/components/ui/label';
+	import { Input } from '$lib/components/ui/input';
+	import { Textarea } from '$lib/components/ui/textarea';
+	import {
+		TICKETS_STATUS_OPTIONS,
+		TICKET_CATEGORY_OPTIONS,
+		TICKET_PRIORITY_OPTIONS
+	} from '$lib/constants';
+	import { Select, SelectContent, SelectItem, SelectTrigger } from '$lib/components/ui/select';
+	import { cn } from '$lib/utils';
+	import { toast } from 'svelte-sonner';
+	import { page } from '$app/state';
+	import { queryParameters, queryParam } from 'sveltekit-search-params';
+
+	interface Props {
+		serverForm: SuperValidated<Infer<CreateTicketSchemaType>>;
+	}
+
+	const { serverForm }: Props = $props();
+
+	const params = queryParameters({
+		ticketId: {
+			encode: (value: string) => value,
+			decode: (value: string | null) => value || null
+		}
+	});
+	let ticketId = queryParam('ticketId');
+	const action = $derived($ticketId ? 'edit' : 'create');
+	$inspect($ticketId);
+
+	const { form, errors, tainted, enhance, reset, restore } = superForm<
+		Infer<CreateTicketSchemaType>,
+		{ status: number; text: string }
+	>(serverForm, {
+		validators: zodClient(CreateTicketSchema),
+		resetForm: true,
+		onUpdate(event) {
+			if (event.result.type === 'success') {
+				clearTicketIdParam();
+				toast.success(action === 'edit' ? 'Ticket updated!' : 'Ticket created!');
+
+				if (action === 'create') {
+					isDialogOpen = false;
+				}
+			}
+		}
+	});
+
+	let isDialogOpen = $state(false);
+
+	$effect(() => {
+		if ($ticketId) {
+			console.log('🚀 ~ $effect ~ $ticketId:', $ticketId);
+			restore(serverForm as SuperFormSnapshot<Infer<CreateTicketSchemaType>>);
+
+			isDialogOpen = true;
+		} else {
+			isDialogOpen = false;
+		}
+	});
+
+	const clearTicketIdParam = async () => {
+		$params = {
+			ticketId: null
+		};
+	};
+
+	const onDialogOpenChange = (state: boolean) => {
+		if (!state) {
+			reset();
+			clearTicketIdParam();
+		}
+
+		isDialogOpen = state;
+	};
+
+	const currentStatusOption = $derived(
+		TICKETS_STATUS_OPTIONS.find((f) => f.value === $form.status)
+	);
+	const currentPriorityOption = $derived(
+		TICKET_PRIORITY_OPTIONS.find((f) => f.value === $form.priority)
+	);
+	const currentCategoryOption = $derived(
+		TICKET_CATEGORY_OPTIONS.find((f) => f.value === $form.category)
+	);
+</script>
+
+<Dialog open={isDialogOpen} onOpenChange={onDialogOpenChange}>
+	<DialogTrigger class={buttonVariants()}>
+		<PlusIcon class="size-4" /> New Ticket
+	</DialogTrigger>
+	<DialogContent>
+		<form
+			method="POST"
+			use:enhance
+			id="create-ticket"
+			action={action === 'edit' ? `?/editTicket&ticketId=${$ticketId}` : '?/createTicket'}
+			class="space-y-4"
+		>
+			<DialogHeader>
+				<DialogTitle>{action === 'edit' ? 'Edit Ticket' : 'New Ticket'}</DialogTitle>
+				<DialogDescription>
+					Don't forget to add as much details as possible to help our team resolve this issue.
+				</DialogDescription>
+			</DialogHeader>
+
+			<div class="grid gap-2">
+				<Label for="title">Title</Label>
+				<Input
+					id="title"
+					name="title"
+					placeholder="e.g. I can't log in"
+					bind:value={$form.title}
+					error={$tainted?.title && $errors.title}
+				/>
+			</div>
+
+			<div class="grid gap-2">
+				<Label for="description">Description</Label>
+				<Textarea
+					id="description"
+					name="description"
+					placeholder="Describe the issue in detail"
+					bind:value={$form.description}
+					error={$tainted?.description && $errors.description}
+				/>
+			</div>
+
+			<div class="grid gap-2">
+				<Label for="status">Status</Label>
+				<Select type="single" name="status" bind:value={$form.status}>
+					<SelectTrigger class="w-full" error={$tainted?.status && $errors.status}>
+						{#if currentStatusOption}
+							<div class="flex items-center gap-2">
+								<currentStatusOption.Icon class={cn('size-4', currentStatusOption.iconColor)} />
+								{currentStatusOption.label}
+							</div>
+						{:else}
+							Select a status
+						{/if}
+					</SelectTrigger>
+					<SelectContent>
+						{#each TICKETS_STATUS_OPTIONS as option (option.value)}
+							<SelectItem value={option.value} label={option.label} class="flex items-center gap-2">
+								<option.Icon class={cn('size-4', option.iconColor)} />
+								{option.label}</SelectItem
+							>
+						{/each}
+					</SelectContent>
+				</Select>
+			</div>
+
+			<div class="grid gap-2">
+				<Label for="priority">Priority</Label>
+				<Select type="single" name="priority" bind:value={$form.priority}>
+					<SelectTrigger class="w-full" error={$tainted?.priority && $errors.priority}>
+						{#if currentPriorityOption}
+							<div class="flex items-center gap-2">
+								<currentPriorityOption.Icon class={cn('size-4', currentPriorityOption.iconColor)} />
+								{currentPriorityOption.label}
+							</div>
+						{:else}
+							Select a priority
+						{/if}
+					</SelectTrigger>
+					<SelectContent>
+						{#each TICKET_PRIORITY_OPTIONS as option (option.value)}
+							<SelectItem value={option.value} label={option.label} class="flex items-center gap-2">
+								<option.Icon class={cn('size-4', option.iconColor)} />
+								{option.label}</SelectItem
+							>
+						{/each}
+					</SelectContent>
+				</Select>
+			</div>
+
+			<div class="grid gap-2">
+				<Label for="category">Category</Label>
+				<Select type="single" name="category" bind:value={$form.category}>
+					<SelectTrigger class="w-full" error={$tainted?.priority && $errors.category}>
+						{#if currentCategoryOption}
+							<div class="flex items-center gap-2">
+								<currentCategoryOption.Icon class={cn('size-4', currentCategoryOption.iconColor)} />
+								{currentCategoryOption.label}
+							</div>
+						{:else}
+							Select a category
+						{/if}
+					</SelectTrigger>
+					<SelectContent>
+						{#each TICKET_CATEGORY_OPTIONS as option (option.value)}
+							<SelectItem value={option.value} label={option.label} class="flex items-center gap-2">
+								<option.Icon class={cn('size-4', option.iconColor)} />
+								{option.label}</SelectItem
+							>
+						{/each}
+					</SelectContent>
+				</Select>
+			</div>
+			<div class="flex w-full items-center justify-end gap-2">
+				<DialogClose type="button" class={buttonVariants({ variant: 'outline' })}
+					>Cancel</DialogClose
+				>
+				<Button type="submit" form="create-ticket">Submit</Button>
+			</div>
+		</form>
+	</DialogContent>
+</Dialog>

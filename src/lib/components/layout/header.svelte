@@ -4,7 +4,7 @@
 	import TicketIcon from '@lucide/svelte/icons/ticket';
 	import PresentationIcon from '@lucide/svelte/icons/presentation';
 	import type { Tables } from '$lib/database.types';
-	import { ROUTES } from '$lib/routes';
+	import { ROUTES } from '$lib/constants';
 
 	interface Props {
 		handleLogout: () => Promise<void>;

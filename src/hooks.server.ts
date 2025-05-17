@@ -5,7 +5,7 @@ import { i18n } from '$lib/i18n';
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
 import type { Database, Tables } from '$lib/database.types';
 import type { PostgrestSingleResponse } from '@supabase/supabase-js';
-import { ROUTES } from '$lib/routes';
+import { ROUTES } from '$lib/constants';
 
 /**
  * Supabase init hook: creates a server client per request

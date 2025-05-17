@@ -16,7 +16,7 @@
 	} from '$lib/components/ui/dropdown-menu';
 	import { Avatar, AvatarImage, AvatarFallback } from '$lib/components/ui/avatar';
 	import type { Tables } from '$lib/database.types';
-	import { ROUTES } from '$lib/routes';
+	import { ROUTES } from '$lib/constants';
 
 	interface Props {
 		profile: Tables<'profiles'>;

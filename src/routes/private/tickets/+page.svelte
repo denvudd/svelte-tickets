@@ -5,7 +5,7 @@
 	import { columns } from './columns.js';
 
 	let { data }: { data: PageData } = $props();
-	let { tickets, forms } = $derived(data);
+	let { tickets, forms, totalCount, pageSize, currentPage } = $derived(data);
 	let { createTicketForm } = $derived(forms);
 </script>
 
@@ -16,5 +16,5 @@
 			<TicketForm serverForm={createTicketForm}/>
 		</div>
 	</div>
-	<DataTable data={tickets} {columns} />
+	<DataTable data={tickets} {columns} {totalCount} {pageSize} />
 </main>

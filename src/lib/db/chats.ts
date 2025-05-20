@@ -2,13 +2,13 @@ import type { Tables, TablesInsert } from '$lib/database.types';
 import type { SelectQueryOptions } from '$lib/utils';
 import type { PostgrestSingleResponse, SupabaseClient } from '@supabase/supabase-js';
 
-export const getChatMembersList = async <Response = Tables<'chat_members'>>(
+export const getChatsList = async <Response = Tables<'chats'>>(
 	supabase: SupabaseClient,
 	options?: SelectQueryOptions
 ): Promise<PostgrestSingleResponse<Response[]>> => {
 	const selectStr = options?.select || '*';
 
-	let query = supabase.from('chat_members').select(selectStr as '*'); // https://github.com/supabase/supabase-js/issues/551
+	let query = supabase.from('chats').select(selectStr as '*'); // https://github.com/supabase/supabase-js/issues/551
 
 	if (options?.filters && options.filters.length > 0) {
 		options.filters.forEach((filter) => {
@@ -57,9 +57,9 @@ export const getChatMembersList = async <Response = Tables<'chat_members'>>(
 	return response;
 };
 
-export const createChatMembers = async (supabase: SupabaseClient, data: TablesInsert<'chat_members'> | TablesInsert<'chat_members'>[]) => {
-	const response: PostgrestSingleResponse<Tables<'chat_members'>> = await supabase
-		.from('chat_members')
+export const createChat = async (supabase: SupabaseClient, data: TablesInsert<'chats'> | TablesInsert<'chats'>[]) => {
+	const response: PostgrestSingleResponse<Tables<'chats'>> = await supabase
+		.from('messages')
 		.insert(data)
 		.select('*')
 		.single();

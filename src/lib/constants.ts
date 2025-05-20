@@ -17,6 +17,7 @@ export const ROUTES = {
 		tickets: '/private/tickets',
 		projects: '/private/projects',
 		messages: '/private/messages',
+		chatId: (chatId: string) => `/private/messages/${chatId}`,
 		account: {
 			profile: '/private/account/profile',
 			settings: '/private/account/settings',

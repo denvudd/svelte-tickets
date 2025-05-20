@@ -2,13 +2,14 @@
 	import { Select as SelectPrimitive, type WithoutChild } from 'bits-ui';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import { cn } from '$lib/utils.js';
+	import type { ClassValue } from 'tailwind-variants';
 
-	type Props = WithoutChild<SelectPrimitive.TriggerProps> & { error?: string[] | false | null };
+	type Props = WithoutChild<SelectPrimitive.TriggerProps> & { error?: string[] | false | null, rootClass?: ClassValue | null | undefined  };
 
-	let { ref = $bindable(null), class: className, children, error, ...restProps }: Props = $props();
+	let { ref = $bindable(null), class: className, children, error, rootClass, ...restProps }: Props = $props();
 </script>
 
-<div class="flex w-full flex-col gap-1.5">
+<div class={cn("flex w-full flex-col gap-1.5", rootClass)}>
 	<SelectPrimitive.Trigger
 		bind:ref
 		class={cn(

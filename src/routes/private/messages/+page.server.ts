@@ -4,8 +4,9 @@ import type { PostgrestSingleResponse } from '@supabase/supabase-js';
 import type { Actions, PageServerLoad } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
 import { getProfileList } from '$lib/db/profile';
-import { getChatMembersList } from '$lib/db/chat-members';
+import { createChatMembers, getChatMembersList } from '$lib/db/chat-members';
 import { getMessageReadsList } from '$lib/db/message-reads';
+import { createChat } from '$lib/db/chats';
 
 type ChatWithProfile = Tables<'chat_members'> & {
 	profiles: Tables<'profiles'>;
@@ -199,10 +200,19 @@ export const actions: Actions = {
 			return redirect(303, ROUTES.auth.login);
 		}
 
-		const { data: chatsByCurrentUser, error: chatsByCurrentUserError } = await supabase
-			.from('chat_members')
-			.select('chat_id')
-			.eq('profile_id', profile.id);
+		const { data: chatsByCurrentUser, error: chatsByCurrentUserError } = await getChatMembersList(
+			supabase,
+			{
+				select: 'chat_id',
+				filters: [
+					{
+						column: 'profile_id',
+						operator: 'eq',
+						value: profile.id
+					}
+				]
+			}
+		);
 
 		if (chatsByCurrentUserError) {
 			console.log('🚀 ~ createChat: ~ myChatsErr:', chatsByCurrentUserError);
@@ -212,18 +222,28 @@ export const actions: Actions = {
 		const chatIds = chatsByCurrentUser.map((c) => c.chat_id);
 
 		if (chatIds.length > 0) {
-			const { data: members, error: membersErr } = await supabase
-				.from('chat_members')
-				.select('chat_id, profile_id')
-				.in('chat_id', chatIds)
-				.in('profile_id', [profile.id, otherProfileId]);
+			const { data: members, error: membersErr } = await getChatMembersList(supabase, {
+				select: 'chat_id, profile_id',
+				filters: [
+					{
+						column: 'chat_id',
+						operator: 'in',
+						value: chatIds
+					},
+					{
+						column: 'profile_id',
+						operator: 'in',
+						value: [profile.id, otherProfileId]
+					}
+				]
+			});
 
 			if (membersErr) {
 				console.log('🚀 ~ createChat: ~ membersErr:', membersErr);
 				return fail(500, { message: membersErr.message });
 			}
 
-			const chatMap = new Map<number, Set<string>>();
+			const chatMap = new Map<string, Set<string>>();
 
 			for (const entry of members) {
 				if (!chatMap.has(entry.chat_id)) {
@@ -236,32 +256,30 @@ export const actions: Actions = {
 			for (const [chatId, membersSet] of chatMap.entries()) {
 				if (membersSet.size === 2 && membersSet.has(profile.id) && membersSet.has(otherProfileId)) {
 					// If it exists, redirect to the existing chat
-					throw redirect(303, `/private/messages/${chatId}`);
+					throw redirect(303, ROUTES.private.chatId(chatId));
 				}
 			}
 		}
 
-		const { data: chat, error: chatErr } = await supabase
-			.from('chats')
-			.insert({ created_by: user.id })
-			.select('id')
-			.single();
+		const { data: chat, error: chatErr } = await createChat(supabase, {
+			created_by: user.id
+		});
 
 		if (chatErr || !chat) {
 			console.log('🚀 ~ createChat: ~ chatErr:', chatErr);
 			return fail(500, { message: chatErr?.message ?? 'Failed to create chat' });
 		}
 
-		const { error: membersInsertErr } = await supabase.from('chat_members').insert([
+		const { error: membersInsertErr } = await createChatMembers(supabase, [
 			{ chat_id: chat.id, profile_id: profile.id },
 			{ chat_id: chat.id, profile_id: otherProfileId }
-		]);
+		])
 
 		if (membersInsertErr) {
 			console.log('🚀 ~ createChat: ~ membersInsertErr:', membersInsertErr);
 			return fail(500, { message: membersInsertErr.message });
 		}
 
-		throw redirect(303, `/private/messages/${chat.id}`);
+		throw redirect(303, ROUTES.private.chatId(chat.id));
 	}
 };

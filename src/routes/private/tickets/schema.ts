@@ -18,7 +18,10 @@ export const CreateTicketSchema = z.object({
 	}),
 	category: z.enum(zodEnum(Object.values(TicketCategory)), {
 		errorMap: () => ({ message: 'Please select a category' })
-	})
+	}),
+	author: z.string(),
+	_authorId: z.string(),
+	_isEditable: z.boolean()
 });
 
 export type CreateTicketSchemaType = typeof CreateTicketSchema;

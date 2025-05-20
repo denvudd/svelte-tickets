@@ -22,6 +22,7 @@
 	} from '$lib/components/ui/table';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
+	import { Select, SelectContent, SelectItem, SelectTrigger } from '$lib/components/ui/select';
 	import {
 		DropdownMenu,
 		DropdownMenuTrigger,
@@ -47,17 +48,41 @@
 	import Settings2Icon from '@lucide/svelte/icons/settings-2';
 	import TrashIcon from '@lucide/svelte/icons/trash';
 	import { type Tables } from '$lib/database.types';
-	import { enhance } from '$app/forms';
+	import { applyAction, enhance } from '$app/forms';
 	import { toast } from 'svelte-sonner';
+	import { goto, invalidate } from '$app/navigation';
+	import { page } from '$app/state';
 
 	type DataTableProps<TData, TValue> = {
 		columns: ColumnDef<TData, TValue>[];
 		data: TData[];
+		totalCount: number;
+		pageSize?: number;
 	};
 
-	let { data, columns }: DataTableProps<TData, TValue> = $props();
+	let { data, columns, totalCount, pageSize = 10 }: DataTableProps<TData, TValue> = $props();
 
-	let pagination = $state<PaginationState>({ pageIndex: 0, pageSize: 10 });
+	// Initialize pagination from URL search params
+	const currentPage = page.url.searchParams.get('page')
+		? parseInt(page.url.searchParams.get('page') || '1') - 1
+		: 0;
+	const urlPageSize = page.url.searchParams.get('pageSize')
+		? parseInt(page.url.searchParams.get('pageSize') || '10')
+		: pageSize;
+
+	let pagination = $state<PaginationState>({
+		pageIndex: currentPage,
+		pageSize: urlPageSize
+	});
+
+	// When pageSize changes, reset to first page if current page would be out of bounds
+	$effect(() => {
+		const maxPage = Math.ceil(totalCount / pagination.pageSize) - 1;
+		if (pagination.pageIndex > maxPage && maxPage >= 0) {
+			table.setPageIndex(0);
+		}
+	});
+
 	let sorting = $state<SortingState>([]);
 	let columnFilters = $state<ColumnFiltersState>([]);
 	let columnVisibility = $state<VisibilityState>({});
@@ -71,16 +96,31 @@
 		},
 		columns,
 		getCoreRowModel: getCoreRowModel(),
-		getPaginationRowModel: getPaginationRowModel(),
-		getSortedRowModel: getSortedRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
+		getSortedRowModel: getSortedRowModel(),
+		manualPagination: true,
 		onPaginationChange: (updater) => {
 			if (typeof updater === 'function') {
-				pagination = updater(pagination);
+				const newPagination = updater(pagination);
+				pagination = newPagination;
+
+				// Navigate to the new page
+				const url = new URL(page.url);
+				url.searchParams.set('page', (newPagination.pageIndex + 1).toString());
+
+				// Add pageSize to URL if it changed from default
+				if (newPagination.pageSize !== 10) {
+					url.searchParams.set('pageSize', newPagination.pageSize.toString());
+				} else {
+					url.searchParams.delete('pageSize');
+				}
+
+				goto(url.toString(), { replaceState: true });
 			} else {
 				pagination = updater;
 			}
 		},
+		pageCount: Math.ceil(totalCount / pagination.pageSize),
 		onSortingChange: (updater) => {
 			if (typeof updater === 'function') {
 				sorting = updater(sorting);
@@ -126,16 +166,21 @@
 				return rowSelection;
 			}
 		}
+		// pageCount: Math.ceil(totalCount / pageSize)
 	});
 
 	const handleToggleDeleteDialog = () => (isDeleteDialogOpen = !isDeleteDialogOpen);
 
 	const selectedRows = $derived(table.getFilteredSelectedRowModel().rows);
-	const totalRows = $derived(table.getFilteredRowModel().rows);
 	const columnsNamesWithoutActions = table
 		.getAllColumns()
 		.filter((col) => col.getCanHide())
 		.slice(0, -1);
+
+	const totalPages = $derived(Math.ceil(totalCount / pagination.pageSize));
+	const currentPageIndex = $derived(pagination.pageIndex);
+	const hasNextPage = $derived(currentPageIndex < totalPages - 1);
+	const hasPreviousPage = $derived(currentPageIndex > 0);
 </script>
 
 <div>
@@ -227,25 +272,52 @@
 	</div>
 	<div class="flex items-center justify-between space-x-2 py-4">
 		<div class="text-muted-foreground flex-1 text-sm">
-			{selectedRows.length} of {totalRows.length} row(s) selected.
+			{selectedRows.length} of {totalCount} row(s) total.
 		</div>
-		<div class="flex items-center gap-2">
-			<Button
-				variant="outline"
-				size="sm"
-				onclick={() => table.previousPage()}
-				disabled={!table.getCanPreviousPage()}
-			>
-				Previous
-			</Button>
-			<Button
-				variant="outline"
-				size="sm"
-				onclick={() => table.nextPage()}
-				disabled={!table.getCanNextPage()}
-			>
-				Next
-			</Button>
+		<div class="flex items-center space-x-6 lg:space-x-8">
+			<div class="flex items-center gap-2">
+				<p class="text-sm font-medium">Rows per page</p>
+				<Select
+					type="single"
+					allowDeselect={false}
+					value={`${table.getState().pagination.pageSize}`}
+					onValueChange={(value) => {
+						table.setPageSize(Number(value));
+					}}
+				>
+					<SelectTrigger rootClass="h-8 w-[70px]" class="h-8 w-[70px]">
+						{String(table.getState().pagination.pageSize)}
+					</SelectTrigger>
+					<SelectContent side="top">
+						{#each [10, 20, 30, 40, 50] as pageSizeOption (pageSizeOption)}
+							<SelectItem value={`${pageSizeOption}`}>
+								{pageSizeOption}
+							</SelectItem>
+						{/each}
+					</SelectContent>
+				</Select>
+			</div>
+			<div class="flex w-[100px] items-center justify-center text-sm font-medium">
+				Page {currentPageIndex + 1} of {totalPages || 1}
+			</div>
+			<div class="flex items-center space-x-2">
+				<Button
+					variant="outline"
+					size="sm"
+					onclick={() => table.previousPage()}
+					disabled={!hasPreviousPage}
+				>
+					Previous
+				</Button>
+				<Button
+					variant="outline"
+					size="sm"
+					onclick={() => table.nextPage()}
+					disabled={!hasNextPage}
+				>
+					Next
+				</Button>
+			</div>
 		</div>
 	</div>
 </div>
@@ -254,12 +326,25 @@
 	<AlertDialogContent>
 		<form
 			method="POST"
-			use:enhance
-			action={`?/deleteTicket&ticketId=${selectedRows.map((row) => (row.original as Tables<'tickets'>).id)}`}
-			onsubmit={() => {
-				isDeleteDialogOpen = false;
-				toast.success('Tickets deleted successfully');
+			use:enhance={({ formElement, formData, action, cancel }) => {
+				return async ({ result }) => {
+					if (result.status === 200) {
+						toast.success('Tickets deleted successfully');
+					} else {
+						toast.error((result as { message?: string }).message || 'Failed to delete tickets');
+					}
+
+					isDeleteDialogOpen = false;
+					invalidate('tickets');
+
+					if (result.type === 'redirect') {
+						goto(result.location);
+					} else {
+						await applyAction(result);
+					}
+				};
 			}}
+			action={`?/deleteTicket&ticketId=${selectedRows.map((row) => (row.original as Tables<'tickets'>).id)}`}
 		>
 			<AlertDialogHeader>
 				<AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>

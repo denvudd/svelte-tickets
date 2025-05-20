@@ -55,10 +55,12 @@ export const getAllTickets = async <Response = Tables<'tickets'>>(
 	return response;
 };
 
-export const getSingleTicket = async (supabase: SupabaseClient, id: string) => {
-	const response: PostgrestSingleResponse<Tables<'tickets'>> = await supabase
+export const getSingleTicket = async <Response = Tables<'tickets'>>(supabase: SupabaseClient, id: string, select?: string) => {
+	const selectStr = select || '*';
+
+	const response: PostgrestSingleResponse<Response> = await supabase
 		.from('tickets')
-		.select('*')
+		.select(selectStr as '*')
 		.eq('id', id)
 		.single();
 
@@ -93,9 +95,9 @@ export const deleteTicket = async (
 	let response;
 
 	if (Array.isArray(id)) {
-		response = await supabase.from('tickets').delete().in('id', id).select('*');
+		response = await supabase.from('tickets').delete().in('id', id);
 	} else {
-		response = await supabase.from('tickets').delete().eq('id', id).select('*').single();
+		response = await supabase.from('tickets').delete().eq('id', id);
 	}
 
 	return response;

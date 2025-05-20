@@ -30,6 +30,8 @@
 	import { cn } from '$lib/utils';
 	import { toast } from 'svelte-sonner';
 	import { queryParameters, queryParam } from 'sveltekit-search-params';
+	import { page } from '$app/state';
+	import { Badge } from '$lib/components/ui/badge';
 
 	interface Props {
 		serverForm: SuperValidated<Infer<CreateTicketSchemaType>>;
@@ -121,6 +123,17 @@
 			</DialogHeader>
 
 			<div class="grid gap-2">
+				<Label for="author">Author</Label>
+				<Badge>
+					{#if page.data.profile?.id === $form._authorId}
+						You
+					{:else}
+						{$form.author}
+					{/if}
+				</Badge>
+			</div>
+
+			<div class="grid gap-2">
 				<Label for="title">Title</Label>
 				<Input
 					id="title"
@@ -128,6 +141,7 @@
 					placeholder="e.g. I can't log in"
 					bind:value={$form.title}
 					error={$tainted?.title && $errors.title}
+					disabled={!$form._isEditable}
 				/>
 			</div>
 
@@ -139,13 +153,18 @@
 					placeholder="Describe the issue in detail"
 					bind:value={$form.description}
 					error={$tainted?.description && $errors.description}
+					disabled={!$form._isEditable}
 				/>
 			</div>
 
 			<div class="grid gap-2">
 				<Label for="status">Status</Label>
-				<Select type="single" name="status" bind:value={$form.status}>
-					<SelectTrigger class="w-full" error={$tainted?.status && $errors.status}>
+				<Select type="single" name="status" bind:value={$form.status} disabled={!$form._isEditable}>
+					<SelectTrigger
+						disabled={!$form._isEditable}
+						class="w-full"
+						error={$tainted?.status && $errors.status}
+					>
 						{#if currentStatusOption}
 							<div class="flex items-center gap-2">
 								<currentStatusOption.Icon class={cn('size-4', currentStatusOption.iconColor)} />
@@ -168,8 +187,17 @@
 
 			<div class="grid gap-2">
 				<Label for="priority">Priority</Label>
-				<Select type="single" name="priority" bind:value={$form.priority}>
-					<SelectTrigger class="w-full" error={$tainted?.priority && $errors.priority}>
+				<Select
+					type="single"
+					name="priority"
+					bind:value={$form.priority}
+					disabled={!$form._isEditable}
+				>
+					<SelectTrigger
+						class="w-full"
+						error={$tainted?.priority && $errors.priority}
+						disabled={!$form._isEditable}
+					>
 						{#if currentPriorityOption}
 							<div class="flex items-center gap-2">
 								<currentPriorityOption.Icon class={cn('size-4', currentPriorityOption.iconColor)} />
@@ -192,8 +220,17 @@
 
 			<div class="grid gap-2">
 				<Label for="category">Category</Label>
-				<Select type="single" name="category" bind:value={$form.category}>
-					<SelectTrigger class="w-full" error={$tainted?.priority && $errors.category}>
+				<Select
+					type="single"
+					name="category"
+					bind:value={$form.category}
+					disabled={!$form._isEditable}
+				>
+					<SelectTrigger
+						class="w-full"
+						error={$tainted?.priority && $errors.category}
+						disabled={!$form._isEditable}
+					>
 						{#if currentCategoryOption}
 							<div class="flex items-center gap-2">
 								<currentCategoryOption.Icon class={cn('size-4', currentCategoryOption.iconColor)} />
@@ -217,7 +254,7 @@
 				<DialogClose type="button" class={buttonVariants({ variant: 'outline' })}
 					>Cancel</DialogClose
 				>
-				<Button type="submit" form="create-ticket">Submit</Button>
+				<Button type="submit" form="create-ticket" disabled={!$form._isEditable}>Submit</Button>
 			</div>
 		</form>
 	</DialogContent>

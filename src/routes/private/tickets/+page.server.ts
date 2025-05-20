@@ -5,22 +5,38 @@ import {
 	getAllTickets,
 	getSingleTicket
 } from '$lib/db/tickets';
-import { zod as zodAdapter } from 'sveltekit-superforms/adapters';
+import { zod as zodAdapter, type Infer } from 'sveltekit-superforms/adapters';
 import { message, superValidate } from 'sveltekit-superforms';
 import type { Actions } from './$types.js';
-import { CreateTicketSchema } from './schema.js';
+import { CreateTicketSchema, type CreateTicketSchemaType } from './schema.js';
 import { ROUTES, TicketCategory, TicketPriority, TicketStatus } from '$lib/constants.js';
 import { fail, redirect } from '@sveltejs/kit';
-import type { TablesInsert, TablesUpdate } from '$lib/database.types.js';
+import type { Tables, TablesInsert, TablesUpdate } from '$lib/database.types.js';
 
-export async function load({ locals: { supabase }, url, depends }) {
+export type TicketsWithProfile = Tables<'tickets'> & {
+	profiles: Tables<'profiles'>;
+};
+
+export async function load({ locals: { supabase, profile }, url, depends }) {
 	depends('tickets');
+
+	if (!profile) throw redirect(303, ROUTES.auth.login);
+
+	const page = parseInt(url.searchParams.get('page') || '1');
+	const pageSize = parseInt(url.searchParams.get('pageSize') || '10');
+
+	const offset = (page - 1) * pageSize;
+
 	const ticketId = url.searchParams.get('ticketId');
 
 	let ticket = null;
 
 	if (ticketId) {
-		const { data: ticketData, error: ticketError } = await getSingleTicket(supabase, ticketId);
+		const { data: ticketData, error: ticketError } = await getSingleTicket<TicketsWithProfile>(
+			supabase,
+			ticketId,
+			'id, title, description, status, priority, category, created_at, owner_id, profiles!tickets_owner_id_fkey(id, full_name)'
+		);
 
 		if (ticketError) {
 			throw redirect(303, ROUTES.private.tickets);
@@ -29,9 +45,17 @@ export async function load({ locals: { supabase }, url, depends }) {
 		ticket = ticketData;
 	}
 
-	const { data: tickets } = await getAllTickets(supabase, {
-		sort: [{ column: 'created_at', order: 'desc' }]
+	const { count } = await supabase.from('tickets').select('*', { count: 'exact', head: true });
+
+	const { data: tickets } = await getAllTickets<TicketsWithProfile>(supabase, {
+		select:
+			'id, title, description, status, priority, category, created_at, owner_id, profiles!tickets_owner_id_fkey(id, full_name)',
+		sort: [{ column: 'created_at', order: 'desc' }],
+		limit: pageSize,
+		offset: offset
 	});
+
+	const isEditableTicket = ticket && ticket.owner_id === profile.id;
 
 	const createTicketForm = await superValidate(
 		{
@@ -39,13 +63,19 @@ export async function load({ locals: { supabase }, url, depends }) {
 			description: ticket?.description || '',
 			status: ticket?.status || TicketStatus.Open,
 			priority: ticket?.priority || TicketPriority.Low,
-			category: ticket?.category || TicketCategory.Bug
-		},
+			category: ticket?.category || TicketCategory.Bug,
+			author: ticket?.profiles.full_name,
+			_authorId: ticket?.profiles.id,
+			_isEditable: isEditableTicket
+		} as Infer<CreateTicketSchemaType>,
 		zodAdapter(CreateTicketSchema)
 	);
 
 	return {
 		tickets: tickets || [],
+		totalCount: count || 0,
+		currentPage: page,
+		pageSize,
 		forms: {
 			createTicketForm
 		}
@@ -78,7 +108,7 @@ export const actions: Actions = {
 			return fail(500, { form });
 		}
 
-		return message(form, { text: 'Ticket created successfully!', status: 201 });
+		return message(form, { message: 'Ticket created successfully!', status: 201 });
 	},
 	editTicket: async ({ request, locals: { supabase, profile }, url }) => {
 		if (!profile) throw redirect(303, ROUTES.auth.login);
@@ -103,7 +133,7 @@ export const actions: Actions = {
 			category: form.data.category
 		};
 
-		const { error: ticketError, data } = await editTicket(supabase, ticketId, payload);
+		const { error: ticketError } = await editTicket(supabase, ticketId, payload);
 
 		if (ticketError) {
 			console.log('🚀 ~ editTicket: ~ ticketError:', ticketError);
@@ -111,17 +141,19 @@ export const actions: Actions = {
 			return fail(500, { form });
 		}
 
-		return message(form, { text: 'Ticket edited successfully!', status: 200 });
+		return message(form, { message: 'Ticket edited successfully!', status: 200 });
 	},
 
-	deleteTicket: async ({ locals: { supabase }, url }) => {
+	deleteTicket: async ({ locals: { supabase, profile }, url }) => {
+		if (!profile) throw redirect(303, ROUTES.auth.login);
+
 		const ticketIdParam = url.searchParams.get('ticketId');
+		console.log('🚀 ~ deleteTicket: ~ ticketIdParam:', ticketIdParam);
 
 		if (!ticketIdParam) {
-			return {
-				text: 'Invalid ticket ID',
-				status: 500
-			};
+			return fail(404, {
+				message: 'Ticket not found'
+			});
 		}
 
 		if (ticketIdParam.includes(',')) {
@@ -134,21 +166,66 @@ export const actions: Actions = {
 				return;
 			}
 
+			const { data: tickets } = await getAllTickets(supabase, {
+				select: 'owner_id',
+				filters: [
+					{
+						column: 'id',
+						operator: 'in',
+						value: ticketIds
+					}
+				]
+			});
+
+			if (!tickets || tickets.length === 0) {
+				return fail(404, {
+					message: 'Tickets not found'
+				});
+			}
+
+			const isCurrentProfileOwner = tickets?.some((ticket) => ticket.owner_id === profile.id);
+
+			if (!isCurrentProfileOwner) {
+				return fail(403, {
+					message: 'You cannot delete tickets that are not yours.'
+				});
+			}
+
 			const { error: ticketError } = await deleteTicket(supabase, ticketIds);
 
 			if (ticketError) {
-				console.log('🚀 ~ deleteTicket: ~ ticketError:', ticketError);
-				return { text: 'Failed to delete tickets', status: 500 };
+				console.log('🚀 ~ deleteTicket (multiple): ~ ticketError:', ticketError);
+				return fail(500, {
+					message: 'Failed to delete tickets'
+				});
 			}
 		} else {
+			const { data: ticket } = await getSingleTicket(supabase, ticketIdParam);
+
+			if (!ticket) {
+				return fail(404, {
+					message: 'Ticket not found'
+				});
+			}
+
+			const isCurrentProfileOwner = ticket.owner_id === profile.id;
+
+			if (!isCurrentProfileOwner) {
+				return fail(403, {
+					message: 'You cannot delete tickets that are not yours.'
+				});
+			}
+
 			const { error: ticketError } = await deleteTicket(supabase, ticketIdParam);
 
 			if (ticketError) {
 				console.log('🚀 ~ deleteTicket: ~ ticketError:', ticketError);
-				return { text: 'Failed to delete ticket', status: 500 };
+				return fail(500, {
+					message: 'Failed to delete ticket'
+				});
 			}
 		}
 
-		return { text: 'Ticket deleted successfully!', status: 200 };
+		return { message: 'Ticket deleted successfully!' };
 	}
 };

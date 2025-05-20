@@ -13,10 +13,15 @@
 	import { toast } from 'svelte-sonner';
 	import { invalidate } from '$app/navigation';
 	import { queryParameters } from 'sveltekit-search-params';
-	import { deleteTicket } from '$lib/db/tickets';
 	import { page } from '$app/state';
 
-	let { id }: { id: number } = $props();
+	interface Props {
+		id: number;
+		owner_id: string;
+	}
+
+	let { id, owner_id }: Props = $props();
+	const isOwner = owner_id === page.data.profile?.id;
 	const stringifiedId = String(id);
 
 	const params = queryParameters();
@@ -40,14 +45,25 @@
 
 	const handleDeleteTicket = async () => {
 		try {
-			await fetch(page.url.href + `?/deleteTicket&ticketId=${stringifiedId}`, {
+			const rawResponse = await fetch(`?/deleteTicket&ticketId=${stringifiedId}`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'multipart/form-data'
-				},
+				}
 			});
+			console.log('🚀 ~ handleDeleteTicket ~ rawResponse:', rawResponse);
+
+			const response = await rawResponse.json();
+			const parsed = JSON.parse(response.data);
+			const message = parsed[1];
+
+			if (response?.data?.status === 200) {
+				toast.success(message);
+			} else {
+				toast.error(message);
+			}
+
 			invalidate('tickets');
-			toast.success('Ticket deleted!');
 		} catch (error) {
 			console.log('🚀 ~ handleDeleteTicket ~ error:', error);
 			toast.error('Failed to delete ticket');
@@ -70,7 +86,9 @@
 			<DropdownMenuItem onclick={handleCopyTicketId}>Copy ID</DropdownMenuItem>
 		</DropdownMenuGroup>
 		<DropdownMenuSeparator />
-		<DropdownMenuItem onclick={handleEditTicket}>Edit</DropdownMenuItem>
-		<DropdownMenuItem onclick={handleDeleteTicket}>Delete</DropdownMenuItem>
+		<DropdownMenuItem onclick={handleEditTicket}>{isOwner ? 'Edit' : 'View'}</DropdownMenuItem>
+		{#if isOwner}
+			<DropdownMenuItem onclick={handleDeleteTicket}>Delete</DropdownMenuItem>
+		{/if}
 	</DropdownMenuContent>
 </DropdownMenu>

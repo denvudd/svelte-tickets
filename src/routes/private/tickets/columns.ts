@@ -1,6 +1,5 @@
 import { renderComponent } from '$lib/components/ui/data-table';
 import type { TicketCategory, TicketPriority, TicketStatus } from '$lib/constants';
-import type { Tables } from '$lib/database.types';
 import {
 	createTicketCategoryIcon,
 	createTicketPriorityIcon,
@@ -15,8 +14,9 @@ import DataTableActions from './_components/data-table/data-table-actions.svelte
 import DataTableTitleButton from './_components/data-table/data-table-title-button.svelte';
 import { Checkbox } from '$lib/components/ui/checkbox';
 import dayjs from 'dayjs';
+import type { TicketsWithProfile } from './+page.server';
 
-export const columns: ColumnDef<Tables<'tickets'>>[] = [
+export const columns: ColumnDef<TicketsWithProfile>[] = [
 	{
 		id: 'select',
 		size: 40,
@@ -94,6 +94,14 @@ export const columns: ColumnDef<Tables<'tickets'>>[] = [
 		}
 	},
 	{
+		accessorKey: 'profiles.full_name',
+		header: 'Creator',
+		cell: (info) => {
+			const value = info.getValue() as string;
+			return value;
+		}
+	},
+	{
 		accessorKey: 'created_at',
 		header: 'Created',
 		cell: (info) => {
@@ -105,7 +113,10 @@ export const columns: ColumnDef<Tables<'tickets'>>[] = [
 		id: 'actions',
 		header: 'Actions',
 		cell: ({ row }) => {
-			return renderComponent(DataTableActions, { id: row.original.id });
+			return renderComponent(DataTableActions, {
+				id: row.original.id,
+				owner_id: row.original.owner_id
+			});
 		}
 	}
 ];

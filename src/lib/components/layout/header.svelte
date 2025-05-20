@@ -16,8 +16,8 @@
 
 <header class="border-accent w-full border-b py-4">
 	<div class="container flex items-center justify-between gap-8">
-		{#if profile}
-			<nav>
+		<nav>
+			{#if profile}
 				<ul class="flex items-center gap-4">
 					<li class="text-sm font-medium">
 						<a href={ROUTES.private.tickets} class="flex items-center gap-2">
@@ -32,7 +32,8 @@
 						</a>
 					</li>
 				</ul>
-			</nav>{/if}
+			{/if}
+		</nav>
 		<div class="flex items-center gap-4">
 			<ColorThemeToggle />
 			{#if profile}

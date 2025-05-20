@@ -38,5 +38,7 @@
 	<ModeWatcher />
 	<Toaster closeButton richColors />
 	<Header {handleLogout} {profile} />
-	{@render children()}
+	<div class="flex h-[calc(100vh-73px)] w-full">
+		{@render children()}
+	</div>
 </ParaglideJS>

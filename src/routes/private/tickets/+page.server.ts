@@ -29,7 +29,7 @@ export async function load({ locals: { supabase }, url, depends }) {
 		ticket = ticketData;
 	}
 
-	const tickets = await getAllTickets(supabase, {
+	const { data: tickets } = await getAllTickets(supabase, {
 		sort: [{ column: 'created_at', order: 'desc' }]
 	});
 
@@ -104,7 +104,6 @@ export const actions: Actions = {
 		};
 
 		const { error: ticketError, data } = await editTicket(supabase, ticketId, payload);
-		console.log('🚀 ~ editTicket: ~ data:', data);
 
 		if (ticketError) {
 			console.log('🚀 ~ editTicket: ~ ticketError:', ticketError);

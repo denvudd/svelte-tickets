@@ -9,6 +9,57 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      chat_members: {
+        Row: {
+          chat_id: string
+          id: string
+          profile_id: string
+        }
+        Insert: {
+          chat_id: string
+          id?: string
+          profile_id: string
+        }
+        Update: {
+          chat_id?: string
+          id?: string
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_members_chat_id_fkey"   
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "chats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_members_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chats: {
+        Row: {
+          created_at: string | null
+          created_by: string
+          id: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string
+          id?: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string
+          id?: string
+        }
+        Relationships: []
+      }
       comments: {
         Row: {
           author_id: string
@@ -44,6 +95,91 @@ export type Database = {
             columns: ["ticket_id"]
             isOneToOne: false
             referencedRelation: "tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      message_reads: {
+        Row: {
+          chat_id: string
+          last_read_at: string | null
+          last_read_message_id: string | null
+          profile_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          chat_id: string
+          last_read_at?: string | null
+          last_read_message_id?: string | null
+          profile_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          chat_id?: string
+          last_read_at?: string | null
+          last_read_message_id?: string | null
+          profile_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_reads_chat_id_fkey"
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "chats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "message_reads_last_read_message_id_fkey"
+            columns: ["last_read_message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "message_reads_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          chat_id: string
+          content: string
+          created_at: string | null
+          id: string
+          profile_id: string
+        }
+        Insert: {
+          chat_id: string
+          content: string
+          created_at?: string | null
+          id?: string
+          profile_id: string
+        }
+        Update: {
+          chat_id?: string
+          content?: string
+          created_at?: string | null
+          id?: string
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_chat_id_fkey"
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "chats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -185,7 +321,22 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_last_messages_for_chats: {
+        Args: { chat_ids: string[] }
+        Returns: {
+          chat_id: string
+          content: string
+          created_at: string
+          profile_id: string
+        }[]
+      }
+      get_unread_counts_for_chats: {
+        Args: { p_chat_ids: string[]; p_profile_id: string; p_last_reads: Json }
+        Returns: {
+          chat_id: string
+          count: number
+        }[]
+      }
     }
     Enums: {
       ticket_category: "bug" | "feature" | "question"

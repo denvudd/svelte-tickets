@@ -6,9 +6,9 @@
 		DialogContent,
 		DialogHeader,
 		DialogTitle,
+		DialogDescription,
 		DialogTrigger
 	} from '$lib/components/ui/dialog';
-	import DialogDescription from '$lib/components/ui/dialog/dialog-description.svelte';
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import {
 		superForm,
@@ -29,7 +29,6 @@
 	import { Select, SelectContent, SelectItem, SelectTrigger } from '$lib/components/ui/select';
 	import { cn } from '$lib/utils';
 	import { toast } from 'svelte-sonner';
-	import { page } from '$app/state';
 	import { queryParameters, queryParam } from 'sveltekit-search-params';
 
 	interface Props {
@@ -45,8 +44,8 @@
 		}
 	});
 	let ticketId = queryParam('ticketId');
+	let isDialogOpen = $state(false);
 	const action = $derived($ticketId ? 'edit' : 'create');
-	$inspect($ticketId);
 
 	const { form, errors, tainted, enhance, reset, restore } = superForm<
 		Infer<CreateTicketSchemaType>,
@@ -66,11 +65,8 @@
 		}
 	});
 
-	let isDialogOpen = $state(false);
-
 	$effect(() => {
 		if ($ticketId) {
-			console.log('🚀 ~ $effect ~ $ticketId:', $ticketId);
 			restore(serverForm as SuperFormSnapshot<Infer<CreateTicketSchemaType>>);
 
 			isDialogOpen = true;

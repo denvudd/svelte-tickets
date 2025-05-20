@@ -1,14 +1,14 @@
-import type { Tables, TablesInsert, TablesUpdate } from '$lib/database.types';
+import type { Tables, TablesInsert } from '$lib/database.types';
 import type { SelectQueryOptions } from '$lib/utils';
 import type { PostgrestSingleResponse, SupabaseClient } from '@supabase/supabase-js';
 
-export const getAllTickets = async <Response = Tables<'tickets'>>(
+export const getMessagesList = async <Response = Tables<'messages'>>(
 	supabase: SupabaseClient,
 	options?: SelectQueryOptions
 ): Promise<PostgrestSingleResponse<Response[]>> => {
 	const selectStr = options?.select || '*';
 
-	let query = supabase.from('tickets').select(selectStr as '*'); // https://github.com/supabase/supabase-js/issues/551
+	let query = supabase.from('messages').select(selectStr as '*'); // https://github.com/supabase/supabase-js/issues/551
 
 	if (options?.filters && options.filters.length > 0) {
 		options.filters.forEach((filter) => {
@@ -32,6 +32,8 @@ export const getAllTickets = async <Response = Tables<'tickets'>>(
 				query = query.in(filter.column, filter.value);
 			} else if (filter.operator === 'is') {
 				query = query.is(filter.column, filter.value);
+			} else if (filter.operator === 'not') {
+				query = query.not(filter.column, 'eq', filter.value);
 			}
 		});
 	}
@@ -55,48 +57,27 @@ export const getAllTickets = async <Response = Tables<'tickets'>>(
 	return response;
 };
 
-export const getSingleTicket = async (supabase: SupabaseClient, id: string) => {
-	const response: PostgrestSingleResponse<Tables<'tickets'>> = await supabase
-		.from('tickets')
-		.select('*')
-		.eq('id', id)
-		.single();
-
-	return response;
-};
-
-export const createTicket = async (supabase: SupabaseClient, data: TablesInsert<'tickets'>) => {
-	const response: PostgrestSingleResponse<Tables<'tickets'>> = await supabase
-		.from('tickets')
+export const createMessage = async (supabase: SupabaseClient, data: TablesInsert<'messages'> | TablesInsert<'messages'>[]) => {
+	const response: PostgrestSingleResponse<Tables<'messages'>> = await supabase
+		.from('messages')
 		.insert(data)
-		.eq('id', data.owner_id)
 		.select('*')
 		.single();
 
 	return response;
 };
 
-export const editTicket = async (
-	supabase: SupabaseClient,
-	id: string,
-	data: TablesUpdate<'tickets'>
-): Promise<PostgrestSingleResponse<Tables<'tickets'>>> => {
-	const response = await supabase.from('tickets').update(data).eq('id', id).select('*').single();
-
-	return response;
-};
-
-export const deleteTicket = async (
-	supabase: SupabaseClient,
-	id: string | string[]
+export const deleteMessage = async (
+    supabase: SupabaseClient,
+    id: string | string[]
 ): Promise<PostgrestSingleResponse<null>> => {
-	let response;
+    let response;
 
-	if (Array.isArray(id)) {
-		response = await supabase.from('tickets').delete().in('id', id).select('*');
-	} else {
-		response = await supabase.from('tickets').delete().eq('id', id).select('*').single();
-	}
+    if (Array.isArray(id)) {
+        response = await supabase.from('messages').delete().in('id', id);
+    } else {
+        response = await supabase.from('messages').delete().eq('id', id);
+    }
 
-	return response;
+    return response;
 };

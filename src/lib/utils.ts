@@ -28,6 +28,22 @@ type TableKeys = keyof DefaultSchema['Tables'];
 export type TablesInsertWithoutId<T extends TableKeys> = Omit<TablesInsert<T>, 'id'>;
 export type TablesUpdateWithoutId<T extends TableKeys> = Omit<TablesUpdate<T>, 'id'>;
 
+export type SelectQueryOptions = {
+	filters?: {
+		column: string;
+		operator: 'eq' | 'neq' | 'gt' | 'lt' | 'gte' | 'lte' | 'like' | 'ilike' | 'in' | 'is' | 'not';
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		value: any;
+	}[];
+	sort?: {
+		column: string;
+		order?: 'asc' | 'desc';
+	}[];
+	select?: string;
+	limit?: number;
+	offset?: number;
+};
+
 export const formatTicketStatusLabel = (status: TicketStatus) => {
 	switch (status) {
 		case TicketStatus.Open:

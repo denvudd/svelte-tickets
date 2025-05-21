@@ -12,6 +12,7 @@ import { CreateTicketSchema, type CreateTicketSchemaType } from './schema.js';
 import { ROUTES, TicketCategory, TicketPriority, TicketStatus } from '$lib/constants.js';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Tables, TablesInsert, TablesUpdate } from '$lib/database.types.js';
+import type { SelectQueryOptions } from '$lib/utils.js';
 
 export type TicketsWithProfile = Tables<'tickets'> & {
 	profiles: Tables<'profiles'>;
@@ -29,6 +30,11 @@ export async function load({ locals: { supabase, profile }, url, depends }) {
 
 	const ticketId = url.searchParams.get('ticketId');
 
+	const statusFilters = url.searchParams.getAll('status');
+	const priorityFilters = url.searchParams.getAll('priority');
+	const categoryFilters = url.searchParams.getAll('category');
+	const titleFilter = url.searchParams.get('title');
+
 	let ticket = null;
 
 	if (ticketId) {
@@ -45,17 +51,70 @@ export async function load({ locals: { supabase, profile }, url, depends }) {
 		ticket = ticketData;
 	}
 
-	const { count } = await supabase.from('tickets').select('*', { count: 'exact', head: true });
+	let countQuery = supabase.from('tickets').select('*', { count: 'exact', head: true });
+
+	if (statusFilters.length > 0) {
+		countQuery = countQuery.in('status', statusFilters);
+	}
+	if (priorityFilters.length > 0) {
+		countQuery = countQuery.in('priority', priorityFilters);
+	}
+	if (categoryFilters.length > 0) {
+		countQuery = countQuery.in('category', categoryFilters);
+	}
+	if (titleFilter) {
+		countQuery = countQuery.ilike('title', `%${titleFilter}%`);
+	}
+
+	const { count } = await countQuery;
+
+	const filters: SelectQueryOptions['filters'] = [];
+
+	if (statusFilters.length > 0) {
+		filters.push({
+			column: 'status',
+			operator: 'in',
+			value: statusFilters
+		});
+	}
+
+	if (priorityFilters.length > 0) {
+		filters.push({
+			column: 'priority',
+			operator: 'in',
+			value: priorityFilters
+		});
+	}
+
+	if (categoryFilters.length > 0) {
+		filters.push({
+			column: 'category',
+			operator: 'in',
+			value: categoryFilters
+		});
+	}
+
+	if (titleFilter) {
+		filters.push({
+			column: 'title',
+			operator: 'ilike',
+			value: `%${titleFilter}%`
+		});
+	}
+
+	console.log('🚀 ~ load ~ filters:', filters);
 
 	const { data: tickets } = await getAllTickets<TicketsWithProfile>(supabase, {
 		select:
 			'id, title, description, status, priority, category, created_at, owner_id, profiles!tickets_owner_id_fkey(id, full_name)',
 		sort: [{ column: 'created_at', order: 'desc' }],
 		limit: pageSize,
-		offset: offset
+		offset: offset,
+		filters: filters
 	});
+	console.log('🚀 ~ load ~ tickets:', tickets);
 
-	const isEditableTicket = ticket && ticket.owner_id === profile.id;
+	const isEditableTicket = ticketId ? ticket && ticket.owner_id === profile.id : true;
 
 	const createTicketForm = await superValidate(
 		{
@@ -78,6 +137,12 @@ export async function load({ locals: { supabase, profile }, url, depends }) {
 		pageSize,
 		forms: {
 			createTicketForm
+		},
+		appliedFilters: {
+			status: statusFilters,
+			priority: priorityFilters,
+			category: categoryFilters,
+			title: titleFilter
 		}
 	};
 }

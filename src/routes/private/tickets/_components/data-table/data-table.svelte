@@ -52,6 +52,7 @@
 	import { toast } from 'svelte-sonner';
 	import { goto, invalidate } from '$app/navigation';
 	import { page } from '$app/state';
+	import DataTableToolbar from './data-table-toolbar.svelte';
 
 	type DataTableProps<TData, TValue> = {
 		columns: ColumnDef<TData, TValue>[];
@@ -166,16 +167,11 @@
 				return rowSelection;
 			}
 		}
-		// pageCount: Math.ceil(totalCount / pageSize)
 	});
 
 	const handleToggleDeleteDialog = () => (isDeleteDialogOpen = !isDeleteDialogOpen);
 
 	const selectedRows = $derived(table.getFilteredSelectedRowModel().rows);
-	const columnsNamesWithoutActions = table
-		.getAllColumns()
-		.filter((col) => col.getCanHide())
-		.slice(0, -1);
 
 	const totalPages = $derived(Math.ceil(totalCount / pagination.pageSize));
 	const currentPageIndex = $derived(pagination.pageIndex);
@@ -183,58 +179,8 @@
 	const hasPreviousPage = $derived(currentPageIndex > 0);
 </script>
 
-<div>
-	<div class="flex items-center pb-4">
-		<div class="flex items-center gap-2">
-			<Input
-				placeholder="Filter tickets..."
-				value={(table.getColumn('title')?.getFilterValue() as string) ?? ''}
-				onchange={(e) => {
-					table.getColumn('title')?.setFilterValue(e.currentTarget.value);
-				}}
-				oninput={(e) => {
-					table.getColumn('title')?.setFilterValue(e.currentTarget.value);
-				}}
-			/>
-			{#if selectedRows.length}
-				<TooltipProvider delayDuration={100}>
-					<Tooltip>
-						<TooltipTrigger>
-							<Button
-								onclick={() => (isDeleteDialogOpen = true)}
-								variant="outline"
-								size="icon"
-								class="flex-shrink-0"
-							>
-								<TrashIcon />
-							</Button>
-						</TooltipTrigger>
-						<TooltipContent class="max-w-xs">Delete selected rows</TooltipContent>
-					</Tooltip>
-				</TooltipProvider>
-			{/if}
-		</div>
-		<DropdownMenu>
-			<DropdownMenuTrigger>
-				{#snippet child({ props })}
-					<Button {...props} variant="outline" class="ml-auto">
-						<Settings2Icon class="size-4" />
-						View
-					</Button>
-				{/snippet}
-			</DropdownMenuTrigger>
-			<DropdownMenuContent align="end">
-				{#each columnsNamesWithoutActions as column (column.id)}
-					<DropdownMenuCheckboxItem
-						class="capitalize"
-						bind:checked={() => column.getIsVisible(), (v) => column.toggleVisibility(!!v)}
-					>
-						{typeof column.columnDef.header === 'string' ? column.columnDef.header : column.id}
-					</DropdownMenuCheckboxItem>
-				{/each}
-			</DropdownMenuContent>
-		</DropdownMenu>
-	</div>
+<div class="space-y-4">
+	<DataTableToolbar {table} />
 	<div class="rounded-md border">
 		<Table>
 			<TableHeader>
@@ -328,13 +274,17 @@
 			method="POST"
 			use:enhance={({ formElement, formData, action, cancel }) => {
 				return async ({ result }) => {
+					console.log('🚀 ~ return ~ result:', result);
 					if (result.status === 200) {
 						toast.success('Tickets deleted successfully');
 					} else {
-						toast.error((result as { message?: string }).message || 'Failed to delete tickets');
+						toast.error(
+							(result as { data: { message?: string } }).data.message || 'Failed to delete tickets'
+						);
 					}
 
 					isDeleteDialogOpen = false;
+					rowSelection = {};
 					invalidate('tickets');
 
 					if (result.type === 'redirect') {

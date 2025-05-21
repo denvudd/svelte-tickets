@@ -61,6 +61,9 @@ export const columns: ColumnDef<TicketsWithProfile>[] = [
 				text,
 				additionalClass: 'font-medium'
 			});
+		},
+		filterFn: (row, id, value) => {
+			return value.includes(row.getValue(id));
 		}
 	},
 	{
@@ -76,6 +79,9 @@ export const columns: ColumnDef<TicketsWithProfile>[] = [
 				text,
 				additionalClass: 'font-medium'
 			});
+		},
+		filterFn: (row, id, value) => {
+			return value.includes(row.getValue(id));
 		}
 	},
 	{
@@ -91,6 +97,9 @@ export const columns: ColumnDef<TicketsWithProfile>[] = [
 				text,
 				additionalClass: 'font-medium'
 			});
+		},
+		filterFn: (row, id, value) => {
+			return value.includes(row.getValue(id));
 		}
 	},
 	{

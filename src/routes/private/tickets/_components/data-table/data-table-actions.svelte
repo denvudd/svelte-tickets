@@ -21,7 +21,7 @@
 	}
 
 	let { id, owner_id }: Props = $props();
-	const isOwner = owner_id === page.data.profile?.id;
+	const isOwner = $derived(owner_id === page.data.profile?.id);
 	const stringifiedId = String(id);
 
 	const params = queryParameters();

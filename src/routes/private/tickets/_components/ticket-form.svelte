@@ -92,6 +92,8 @@
 		isDialogOpen = state;
 	};
 
+	const isOwner = $derived(page.data.profile?.id === $form._authorId);
+
 	const currentStatusOption = $derived(
 		TICKETS_STATUS_OPTIONS.find((f) => f.value === $form.status)
 	);
@@ -116,22 +118,26 @@
 			class="space-y-4"
 		>
 			<DialogHeader>
-				<DialogTitle>{action === 'edit' ? 'Edit Ticket' : 'New Ticket'}</DialogTitle>
+				<DialogTitle
+					>{isOwner ? (action === 'edit' ? 'Edit Ticket' : 'New Ticket') : 'Details'}</DialogTitle
+				>
 				<DialogDescription>
 					Don't forget to add as much details as possible to help our team resolve this issue.
 				</DialogDescription>
 			</DialogHeader>
 
-			<div class="grid gap-2">
-				<Label for="author">Author</Label>
-				<Badge>
-					{#if page.data.profile?.id === $form._authorId}
-						You
-					{:else}
-						{$form.author}
-					{/if}
-				</Badge>
-			</div>
+			{#if action === 'edit'}
+				<div class="grid gap-2">
+					<Label for="author">Author</Label>
+					<Badge>
+						{#if isOwner}
+							You
+						{:else}
+							{$form.author}
+						{/if}
+					</Badge>
+				</div>
+			{/if}
 
 			<div class="grid gap-2">
 				<Label for="title">Title</Label>

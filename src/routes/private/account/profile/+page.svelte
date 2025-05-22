@@ -22,6 +22,7 @@
 	import { invalidate } from '$app/navigation';
 	import type { PageProps } from './$types';
 	import { ROUTES } from '$lib/constants';
+	import * as m from '$lib/paraglide/messages';
 
 	let { data }: PageProps = $props();
 	let { user, profile, form: loadedForm } = $state(data);
@@ -57,8 +58,8 @@
 
 <Card class="mx-auto w-full max-w-full">
 	<CardHeader>
-		<CardTitle>Profile</CardTitle>
-		<CardDescription>Update your personal information</CardDescription>
+		<CardTitle>{m.profile_title()}</CardTitle>
+		<CardDescription>{m.profile_description()}</CardDescription>
 	</CardHeader>
 
 	<form method="POST" enctype="multipart/form-data" use:enhance>
@@ -84,7 +85,7 @@
 						class="flex items-center gap-2"
 					>
 						<UploadIcon class="h-4 w-4" />
-						Upload Avatar
+						{m.profile_upload_avatar()}
 					</Button>
 				</div>
 				{#if $errors.avatar}
@@ -95,12 +96,12 @@
 			<div class="space-y-2">
 				<Label for="full_name" class="flex items-center gap-2">
 					<UserIcon class="h-4 w-4" />
-					Name
+					{m.profile_name_label()}
 				</Label>
 				<Input
 					name="full_name"
 					id="full_name"
-					placeholder="Enter your name"
+					placeholder={m.profile_name_placeholder()}
 					required
 					bind:value={$form.full_name}
 					aria-invalid={$errors.full_name ? 'true' : undefined}
@@ -112,11 +113,11 @@
 				<div class="flex items-center">
 					<Label for="email" class="flex items-center gap-2">
 						<MailIcon class="h-4 w-4" />
-						Email
+						{m.profile_email_label()}
 					</Label>
 					<a
 						href={`${ROUTES.private.account.settings}#email-management`}
-						class="ml-auto inline-block text-sm underline">Want to change it?</a
+						class="ml-auto inline-block text-sm underline">{m.profile_email_want_change()}</a
 					>
 				</div>
 				<Input id="email" value={user?.email} disabled />
@@ -125,12 +126,12 @@
 			<div class="space-y-2">
 				<Label for="occupation" class="flex items-center gap-2">
 					<BriefcaseIcon class="h-4 w-4" />
-					Occupation
+					{m.profile_occupation_label()}
 				</Label>
 				<Input
 					name="occupation"
 					id="occupation"
-					placeholder="Enter your occupation"
+					placeholder={m.profile_occupation_placeholder()}
 					bind:value={$form.occupation}
 					aria-invalid={$errors.occupation ? 'true' : undefined}
 					error={$errors.occupation}
@@ -139,7 +140,7 @@
 		</CardContent>
 
 		<CardFooter>
-			<Button type="submit" class="w-full">Save Changes</Button>
+			<Button type="submit" class="w-full">{m.profile_save()}</Button>
 		</CardFooter>
 	</form>
 </Card>

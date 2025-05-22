@@ -7,6 +7,7 @@
 	import type { Table } from '@tanstack/table-core';
 	import { buttonVariants } from '$lib/components/ui/button';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let { table }: { table: Table<TData> } = $props();
 
@@ -25,11 +26,11 @@
 		})}
 	>
 		<Settings2Icon />
-		View
+		{m.tickets_view()}
 	</DropdownMenu.Trigger>
 	<DropdownMenu.Content>
 		<DropdownMenu.Group>
-			<DropdownMenu.Label>Toggle columns</DropdownMenu.Label>
+			<DropdownMenu.Label>{m.tickets_toggle_columns()}</DropdownMenu.Label>
 			<DropdownMenu.Separator />
 			{#each columnsNamesWithoutActions as column (column)}
 				<DropdownMenu.CheckboxItem

@@ -16,7 +16,9 @@ import { Checkbox } from '$lib/components/ui/checkbox';
 import dayjs from 'dayjs';
 import type { TicketsWithProfile } from './+page.server';
 
-export const columns: ColumnDef<TicketsWithProfile>[] = [
+import * as m from '$lib/paraglide/messages.js';
+
+export const columns: () => ColumnDef<TicketsWithProfile>[] = () => [
 	{
 		id: 'select',
 		size: 40,
@@ -50,7 +52,7 @@ export const columns: ColumnDef<TicketsWithProfile>[] = [
 	},
 	{
 		accessorKey: 'status',
-		header: 'Status',
+		header: m.tickets_col_status(),
 		cell: (info) => {
 			const value = info.getValue() as TicketStatus;
 			const text = formatTicketStatusLabel(value);
@@ -68,7 +70,7 @@ export const columns: ColumnDef<TicketsWithProfile>[] = [
 	},
 	{
 		accessorKey: 'priority',
-		header: 'Priority',
+		header: m.tickets_col_priority(),
 		cell: (info) => {
 			const value = info.getValue() as TicketPriority;
 			const text = formatTicketPriorityLabel(value);
@@ -86,7 +88,7 @@ export const columns: ColumnDef<TicketsWithProfile>[] = [
 	},
 	{
 		accessorKey: 'category',
-		header: 'Category',
+		header: m.tickets_col_category(),
 		cell: (info) => {
 			const value = info.getValue() as TicketCategory;
 			const text = formatTicketCategoryLabel(value);
@@ -104,7 +106,7 @@ export const columns: ColumnDef<TicketsWithProfile>[] = [
 	},
 	{
 		accessorKey: 'profiles.full_name',
-		header: 'Creator',
+		header: m.tickets_col_creator(),
 		cell: (info) => {
 			const value = info.getValue() as string;
 			return value;
@@ -112,7 +114,7 @@ export const columns: ColumnDef<TicketsWithProfile>[] = [
 	},
 	{
 		accessorKey: 'created_at',
-		header: 'Created',
+		header: m.tickets_col_created(),
 		cell: (info) => {
 			const value = info.getValue() as string;
 			return dayjs(value).format('DD/MM/YYYY HH:mm');
@@ -120,7 +122,7 @@ export const columns: ColumnDef<TicketsWithProfile>[] = [
 	},
 	{
 		id: 'actions',
-		header: 'Actions',
+		header: m.tickets_col_actions(),
 		cell: ({ row }) => {
 			return renderComponent(DataTableActions, {
 				id: row.original.id,

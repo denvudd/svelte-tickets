@@ -10,9 +10,9 @@
 		CardDescription
 	} from '$lib/components/ui/card';
 	import { enhance } from '$app/forms';
-	import { supabase } from '$lib/supabase-client.js';
 	import { cn } from '$lib/utils';
 	import { ROUTES } from '$lib/constants.js';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let { form } = $props();
 
@@ -27,13 +27,13 @@
 
 <Card class="mx-auto max-w-sm">
 	<CardHeader>
-		<CardTitle class="text-2xl">Login</CardTitle>
-		<CardDescription>Enter your email and password below to login to your account</CardDescription>
+		<CardTitle class="text-2xl">{m.login_title()}</CardTitle>
+		<CardDescription>{m.login_description()}</CardDescription>
 	</CardHeader>
 	<CardContent class="space-y-4">
 		<form method="POST" use:enhance action="?/login" class="space-y-4">
 			<div class="grid gap-2">
-				<Label for="email">Email</Label>
+				<Label for="email">{m.login_email_label()}</Label>
 				<Input
 					id="email"
 					name="email"
@@ -44,7 +44,7 @@
 
 			<div class="grid gap-2">
 				<div class="flex items-center">
-					<Label for="password">Password</Label>
+					<Label for="password">{m.login_password_label()}</Label>
 					<a href={ROUTES.auth.forgotPassword} class="ml-auto inline-block text-sm underline"
 						>Forgot your password?</a
 					>
@@ -58,7 +58,7 @@
 				/>
 			</div>
 
-			<Button type="submit" class="w-full">Login</Button>
+			<Button type="submit" class="w-full">{m.login_button()}</Button>
 		</form>
 
 		<form id="socials" method="POST" use:enhance>
@@ -66,12 +66,12 @@
 				class={cn(buttonVariants({ variant: 'outline' }), 'w-full')}
 				formaction="?/login&provider=google"
 			>
-				Login with Google
+				{m.login_google()}
 			</button>
 		</form>
 
 		<div class="mt-4 text-center text-sm">
-			Don't have an account? <a href={ROUTES.auth.signUp} class="underline">Sign up</a>
+			{m.login_have_account()} <a href={ROUTES.auth.signUp} class="underline">{m.login_signup()}</a>
 		</div>
 	</CardContent>
 </Card>

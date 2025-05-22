@@ -32,6 +32,7 @@
 	import { queryParameters, queryParam } from 'sveltekit-search-params';
 	import { page } from '$app/state';
 	import { Badge } from '$lib/components/ui/badge';
+	import * as m from '$lib/paraglide/messages.js';
 
 	interface Props {
 		serverForm: SuperValidated<Infer<CreateTicketSchemaType>>;
@@ -58,7 +59,7 @@
 		onUpdate(event) {
 			if (event.result.type === 'success') {
 				clearTicketIdParam();
-				toast.success(action === 'edit' ? 'Ticket updated!' : 'Ticket created!');
+				toast.success(action === 'edit' ? m.tickets_form_updated() : m.tickets_form_created());
 
 				if (action === 'create') {
 					isDialogOpen = false;
@@ -95,19 +96,20 @@
 	const isOwner = $derived(page.data.profile?.id === $form._authorId);
 
 	const currentStatusOption = $derived(
-		TICKETS_STATUS_OPTIONS.find((f) => f.value === $form.status)
+		TICKETS_STATUS_OPTIONS().find((f) => f.value === $form.status)
 	);
 	const currentPriorityOption = $derived(
-		TICKET_PRIORITY_OPTIONS.find((f) => f.value === $form.priority)
+		TICKET_PRIORITY_OPTIONS().find((f) => f.value === $form.priority)
 	);
 	const currentCategoryOption = $derived(
-		TICKET_CATEGORY_OPTIONS.find((f) => f.value === $form.category)
+		TICKET_CATEGORY_OPTIONS().find((f) => f.value === $form.category)
 	);
 </script>
 
 <Dialog open={isDialogOpen} onOpenChange={onDialogOpenChange}>
 	<DialogTrigger class={buttonVariants()}>
-		<PlusIcon class="size-4" /> New Ticket
+		<PlusIcon class="size-4" />
+		{m.tickets_new()}
 	</DialogTrigger>
 	<DialogContent>
 		<form
@@ -119,19 +121,23 @@
 		>
 			<DialogHeader>
 				<DialogTitle
-					>{isOwner ? (action === 'edit' ? 'Edit Ticket' : 'New Ticket') : 'Details'}</DialogTitle
+					>{isOwner
+						? action === 'edit'
+							? m.tickets_form_edit()
+							: m.tickets_form_new()
+						: m.tickets_form_details()}</DialogTitle
 				>
 				<DialogDescription>
-					Don't forget to add as much details as possible to help our team resolve this issue.
+					{m.tickets_form_description()}
 				</DialogDescription>
 			</DialogHeader>
 
 			{#if action === 'edit'}
 				<div class="grid gap-2">
-					<Label for="author">Author</Label>
+					<Label for="author">{m.tickets_form_author_label()}</Label>
 					<Badge>
 						{#if isOwner}
-							You
+							{m.tickets_form_author_you()}
 						{:else}
 							{$form.author}
 						{/if}
@@ -140,11 +146,11 @@
 			{/if}
 
 			<div class="grid gap-2">
-				<Label for="title">Title</Label>
+				<Label for="title">{m.tickets_form_title_label()}</Label>
 				<Input
 					id="title"
 					name="title"
-					placeholder="e.g. I can't log in"
+					placeholder={m.tickets_form_title_placeholder()}
 					bind:value={$form.title}
 					error={$tainted?.title && $errors.title}
 					disabled={!$form._isEditable}
@@ -152,11 +158,11 @@
 			</div>
 
 			<div class="grid gap-2">
-				<Label for="description">Description</Label>
+				<Label for="description">{m.tickets_form_description_label()}</Label>
 				<Textarea
 					id="description"
 					name="description"
-					placeholder="Describe the issue in detail"
+					placeholder={m.tickets_form_description_placeholder()}
 					bind:value={$form.description}
 					error={$tainted?.description && $errors.description}
 					disabled={!$form._isEditable}
@@ -164,7 +170,7 @@
 			</div>
 
 			<div class="grid gap-2">
-				<Label for="status">Status</Label>
+				<Label for="status">{m.tickets_status()}</Label>
 				<Select type="single" name="status" bind:value={$form.status} disabled={!$form._isEditable}>
 					<SelectTrigger
 						disabled={!$form._isEditable}
@@ -181,7 +187,7 @@
 						{/if}
 					</SelectTrigger>
 					<SelectContent>
-						{#each TICKETS_STATUS_OPTIONS as option (option.value)}
+						{#each TICKETS_STATUS_OPTIONS() as option (option.value)}
 							<SelectItem value={option.value} label={option.label} class="flex items-center gap-2">
 								<option.Icon class={cn('size-4', option.iconColor)} />
 								{option.label}</SelectItem
@@ -192,7 +198,7 @@
 			</div>
 
 			<div class="grid gap-2">
-				<Label for="priority">Priority</Label>
+				<Label for="priority">{m.tickets_priority()}</Label>
 				<Select
 					type="single"
 					name="priority"
@@ -214,7 +220,7 @@
 						{/if}
 					</SelectTrigger>
 					<SelectContent>
-						{#each TICKET_PRIORITY_OPTIONS as option (option.value)}
+						{#each TICKET_PRIORITY_OPTIONS() as option (option.value)}
 							<SelectItem value={option.value} label={option.label} class="flex items-center gap-2">
 								<option.Icon class={cn('size-4', option.iconColor)} />
 								{option.label}</SelectItem
@@ -225,7 +231,7 @@
 			</div>
 
 			<div class="grid gap-2">
-				<Label for="category">Category</Label>
+				<Label for="category">{m.tickets_category()}</Label>
 				<Select
 					type="single"
 					name="category"
@@ -247,7 +253,7 @@
 						{/if}
 					</SelectTrigger>
 					<SelectContent>
-						{#each TICKET_CATEGORY_OPTIONS as option (option.value)}
+						{#each TICKET_CATEGORY_OPTIONS() as option (option.value)}
 							<SelectItem value={option.value} label={option.label} class="flex items-center gap-2">
 								<option.Icon class={cn('size-4', option.iconColor)} />
 								{option.label}</SelectItem
@@ -258,9 +264,9 @@
 			</div>
 			<div class="flex w-full items-center justify-end gap-2">
 				<DialogClose type="button" class={buttonVariants({ variant: 'outline' })}
-					>Cancel</DialogClose
+					>{m.tickets_form_button_cancel()}</DialogClose
 				>
-				<Button type="submit" form="create-ticket" disabled={!$form._isEditable}>Submit</Button>
+				<Button type="submit" form="create-ticket" disabled={!$form._isEditable}>{m.tickets_form_button_submit()}</Button>
 			</div>
 		</form>
 	</DialogContent>

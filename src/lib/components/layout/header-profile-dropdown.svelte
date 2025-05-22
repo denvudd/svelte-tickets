@@ -19,6 +19,7 @@
 	import { ROUTES } from '$lib/constants';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import * as m from '$lib/paraglide/messages.js';
 
 	interface Props {
 		profile: Tables<'profiles'>;
@@ -116,27 +117,27 @@
 	</DropdownMenuTrigger>
 	<DropdownMenuContent class="w-56">
 		<DropdownMenuGroup>
-			<DropdownMenuGroupHeading>My Account</DropdownMenuGroupHeading>
+			<DropdownMenuGroupHeading>{m.header_my_account()}</DropdownMenuGroupHeading>
 			<DropdownMenuSeparator />
 			<DropdownMenuGroup>
 				<a href={ROUTES.private.account.profile}>
 					<DropdownMenuItem>
 						<UserIcon class="size-4" />
-						<span>Profile</span>
+						<span>{m.header_profile()}</span>
 						<DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
 					</DropdownMenuItem>
 				</a>
 				<a href={ROUTES.private.account.settings}>
 					<DropdownMenuItem>
 						<SettingsIcon class="size-4" />
-						<span>Settings</span>
+						<span>{m.header_settings()}</span>
 						<DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
 					</DropdownMenuItem>
 				</a>
 				<a href={ROUTES.private.account.appearence}>
 					<DropdownMenuItem>
 						<PaintbrushIcon class="size-4" />
-						<span>Appearance</span>
+						<span>{m.header_appearance()}</span>
 						<DropdownMenuShortcut>⌘A</DropdownMenuShortcut>
 					</DropdownMenuItem>
 				</a>
@@ -146,7 +147,7 @@
 				<a href={ROUTES.private.messages}>
 					<DropdownMenuItem>
 						<MessageSquareIcon class="size-4" />
-						<span>Messages</span>
+						<span>{m.header_messages()}</span>
 						<DropdownMenuShortcut>⌘M</DropdownMenuShortcut>
 					</DropdownMenuItem>
 				</a>
@@ -154,7 +155,7 @@
 			<DropdownMenuSeparator />
 			<DropdownMenuItem onclick={handleLogout}>
 				<LogOutIcon class="size-4" />
-				<span>Log out</span>
+				<span>{m.header_logout()}</span>
 				<DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
 			</DropdownMenuItem>
 		</DropdownMenuGroup>

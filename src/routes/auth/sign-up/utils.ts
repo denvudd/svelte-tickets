@@ -1,20 +1,21 @@
 import { UserRole } from '$lib/role-manager';
+import * as m from '$lib/paraglide/messages';
 
-export const USER_ROLES_DESCRIPTION = [
+export const USER_ROLES_DESCRIPTION = () => [
 	{
 		role: UserRole.User,
-		label: 'User',
+		label: m.signup_role_user_label(),
 		description: [
-			'Can create new tickets, view only their own tickets, edit them up to the first agent comment, add comments within their own ticket.',
-			"Cannot see other people's tickets and cannot change statuses."
+			m.signup_role_user_description1(),
+			m.signup_role_user_description2(),
 		]
 	},
 	{
 		role: UserRole.Agent,
-		label: 'Agent',
+		label:  m.signup_role_agent_label(),
 		description: [
-			'Sees all open tickets, can change their status, add comments to any ticket, and assign priorities.',
-			'Has access to filtering/pagination of all queries.'
+			m.signup_role_agent_description1(),
+			m.signup_role_agent_description2(),
 		]
 	}
 ];

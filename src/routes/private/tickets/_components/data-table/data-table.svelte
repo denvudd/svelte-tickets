@@ -4,7 +4,6 @@
 		type ColumnFiltersState,
 		getCoreRowModel,
 		getFilteredRowModel,
-		getPaginationRowModel,
 		getSortedRowModel,
 		type PaginationState,
 		type RowSelectionState,
@@ -21,15 +20,14 @@
 		TableRow
 	} from '$lib/components/ui/table';
 	import { Button } from '$lib/components/ui/button';
-	import { Input } from '$lib/components/ui/input';
+	import * as m from '$lib/paraglide/messages.js';
 	import { Select, SelectContent, SelectItem, SelectTrigger } from '$lib/components/ui/select';
-
-	import { goto, invalidate } from '$app/navigation';
-	import { page } from '$app/state';
 	import DataTableToolbar from './data-table-toolbar.svelte';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
 
 	type DataTableProps<TData, TValue> = {
-		columns: ColumnDef<TData, TValue>[];
+		columns: () => ColumnDef<TData, TValue>[];
 		data: TData[];
 		totalCount: number;
 		pageSize?: number;
@@ -37,7 +35,6 @@
 
 	let { data, columns, totalCount, pageSize = 10 }: DataTableProps<TData, TValue> = $props();
 
-	// Initialize pagination from URL search params
 	const currentPage = page.url.searchParams.get('page')
 		? parseInt(page.url.searchParams.get('page') || '1') - 1
 		: 0;
@@ -50,7 +47,6 @@
 		pageSize: urlPageSize
 	});
 
-	// When pageSize changes, reset to first page if current page would be out of bounds
 	$effect(() => {
 		const maxPage = Math.ceil(totalCount / pagination.pageSize) - 1;
 		if (pagination.pageIndex > maxPage && maxPage >= 0) {
@@ -67,7 +63,7 @@
 		get data() {
 			return data;
 		},
-		columns,
+		columns: columns(),
 		getCoreRowModel: getCoreRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
 		getSortedRowModel: getSortedRowModel(),
@@ -77,11 +73,9 @@
 				const newPagination = updater(pagination);
 				pagination = newPagination;
 
-				// Navigate to the new page
 				const url = new URL(page.url);
 				url.searchParams.set('page', (newPagination.pageIndex + 1).toString());
 
-				// Add pageSize to URL if it changed from default
 				if (newPagination.pageSize !== 10) {
 					url.searchParams.set('pageSize', newPagination.pageSize.toString());
 				} else {
@@ -180,7 +174,9 @@
 					</TableRow>
 				{:else}
 					<TableRow>
-						<TableCell colspan={columns.length} class="h-24 text-center">No results.</TableCell>
+						<TableCell colspan={columns.length} class="h-24 text-center"
+							>{m.tickets_empty()}</TableCell
+						>
 					</TableRow>
 				{/each}
 			</TableBody>
@@ -188,11 +184,14 @@
 	</div>
 	<div class="flex items-center justify-between space-x-2 py-4">
 		<div class="text-muted-foreground flex-1 text-sm">
-			{selectedRows.length} of {totalCount} row(s) total.
+			{m.tickets_selected_rows_counter({
+				selectedRows: selectedRows.length,
+				totalCount: totalCount
+			})}
 		</div>
 		<div class="flex items-center space-x-6 lg:space-x-8">
 			<div class="flex items-center gap-2">
-				<p class="text-sm font-medium">Rows per page</p>
+				<p class="text-sm font-medium">{m.tickets_rows_per_page()}</p>
 				<Select
 					type="single"
 					allowDeselect={false}
@@ -214,7 +213,10 @@
 				</Select>
 			</div>
 			<div class="flex w-[100px] items-center justify-center text-sm font-medium">
-				Page {currentPageIndex + 1} of {totalPages || 1}
+				{m.tickets_page_of({
+					currentPage: currentPageIndex + 1,
+					totalPages: totalPages || 1
+				})}
 			</div>
 			<div class="flex items-center space-x-2">
 				<Button
@@ -223,7 +225,7 @@
 					onclick={() => table.previousPage()}
 					disabled={!hasPreviousPage}
 				>
-					Previous
+					{m.tickets_prev()}
 				</Button>
 				<Button
 					variant="outline"
@@ -231,7 +233,7 @@
 					onclick={() => table.nextPage()}
 					disabled={!hasNextPage}
 				>
-					Next
+					{m.tickets_next()}
 				</Button>
 			</div>
 		</div>

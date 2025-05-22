@@ -79,7 +79,6 @@
 									selectedValues.add(option.value);
 								}
 								const filterValues = Array.from(selectedValues);
-								console.log('🚀 ~ filterValues:', filterValues);
 								column?.setFilterValue(filterValues.length ? filterValues : undefined);
 							}}
 						>

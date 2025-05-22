@@ -14,6 +14,7 @@
 	import { invalidate } from '$app/navigation';
 	import { queryParameters } from 'sveltekit-search-params';
 	import { page } from '$app/state';
+	import * as m from '$lib/paraglide/messages.js';
 
 	interface Props {
 		id: number;
@@ -29,9 +30,9 @@
 	const handleCopyTicketId = () => {
 		if ('navigator' in window) {
 			navigator.clipboard.writeText(stringifiedId);
-			toast.success('Ticket ID copied to clipboard!');
+			toast.success(m.tickets_actions_copy_success());
 		} else {
-			toast.error('Clipboard not available');
+			toast.error(m.tickets_actions_copy_failed());
 		}
 	};
 
@@ -51,7 +52,6 @@
 					'Content-Type': 'multipart/form-data'
 				}
 			});
-			console.log('🚀 ~ handleDeleteTicket ~ rawResponse:', rawResponse);
 
 			const response = await rawResponse.json();
 			const parsed = JSON.parse(response.data);
@@ -66,7 +66,7 @@
 			invalidate('tickets');
 		} catch (error) {
 			console.log('🚀 ~ handleDeleteTicket ~ error:', error);
-			toast.error('Failed to delete ticket');
+			toast.error(m.tickets_delete_failed());
 		}
 	};
 </script>
@@ -82,13 +82,13 @@
 	</DropdownMenuTrigger>
 	<DropdownMenuContent>
 		<DropdownMenuGroup>
-			<DropdownMenuGroupHeading>Actions</DropdownMenuGroupHeading>
-			<DropdownMenuItem onclick={handleCopyTicketId}>Copy ID</DropdownMenuItem>
+			<DropdownMenuGroupHeading>{m.tickets_actions_title()}</DropdownMenuGroupHeading>
+			<DropdownMenuItem onclick={handleCopyTicketId}>{m.tickets_actions_copy()}</DropdownMenuItem>
 		</DropdownMenuGroup>
 		<DropdownMenuSeparator />
-		<DropdownMenuItem onclick={handleEditTicket}>{isOwner ? 'Edit' : 'View'}</DropdownMenuItem>
+		<DropdownMenuItem onclick={handleEditTicket}>{isOwner ? m.tickets_actions_edit() : m.tickets_actions_view()}</DropdownMenuItem>
 		{#if isOwner}
-			<DropdownMenuItem onclick={handleDeleteTicket}>Delete</DropdownMenuItem>
+			<DropdownMenuItem onclick={handleDeleteTicket}>{m.tickets_actions_delete()}</DropdownMenuItem>
 		{/if}
 	</DropdownMenuContent>
 </DropdownMenu>

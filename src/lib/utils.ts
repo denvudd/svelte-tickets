@@ -15,6 +15,8 @@ import BugIcon from '@lucide/svelte/icons/bug';
 import GitBranchIcon from '@lucide/svelte/icons/git-branch';
 import CircleHelpIcon from '@lucide/svelte/icons/circle-help';
 
+import * as m from '$lib/paraglide/messages.js';
+
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
@@ -47,11 +49,11 @@ export type SelectQueryOptions = {
 export const formatTicketStatusLabel = (status: TicketStatus) => {
 	switch (status) {
 		case TicketStatus.Open:
-			return 'Open';
+			return m.status_open();
 		case TicketStatus.InProgress:
-			return 'In Progress';
+			return m.status_in_progress();
 		case TicketStatus.Closed:
-			return 'Closed';
+			return m.status_closed();
 	}
 };
 
@@ -78,11 +80,11 @@ export const createTicketStatusIcon = (status: TicketStatus) => {
 export const formatTicketPriorityLabel = (status: TicketPriority) => {
 	switch (status) {
 		case TicketPriority.Low:
-			return 'Low';
+			return m.priority_low();
 		case TicketPriority.Medium:
-			return 'Medium';
+			return m.priority_medium();
 		case TicketPriority.High:
-			return 'High';
+			return m.priority_high();
 	}
 };
 
@@ -109,11 +111,11 @@ export const createTicketPriorityIcon = (status: TicketPriority) => {
 export const formatTicketCategoryLabel = (status: TicketCategory) => {
 	switch (status) {
 		case TicketCategory.Bug:
-			return 'Bug';
+			return m.category_bug();
 		case TicketCategory.Feature:
-			return 'Feature';
+			return m.category_feature();
 		case TicketCategory.Question:
-			return 'Question';
+			return m.category_question();
 	}
 };
 

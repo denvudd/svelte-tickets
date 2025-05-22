@@ -2,9 +2,10 @@
 	import ColorThemeToggle from '$lib/components/color-theme-toggle.svelte';
 	import HeaderProfileDropdown from './header-profile-dropdown.svelte';
 	import TicketIcon from '@lucide/svelte/icons/ticket';
-	import PresentationIcon from '@lucide/svelte/icons/presentation';
 	import type { Tables } from '$lib/database.types';
 	import { ROUTES } from '$lib/constants';
+	import * as m from '$lib/paraglide/messages.js';
+	import LanguageSwitcher from '../language-switcher.svelte';
 
 	interface Props {
 		handleLogout: () => Promise<void>;
@@ -22,20 +23,17 @@
 					<li class="text-sm font-medium">
 						<a href={ROUTES.private.tickets} class="flex items-center gap-2">
 							<TicketIcon class="h-4 w-4" />
-							Tickets
+							{m.header_tickets()}
 						</a>
 					</li>
-					<!-- <li class="text-sm font-medium">
-						<a href={ROUTES.private.projects} class="flex items-center gap-2">
-							<PresentationIcon class="h-4 w-4" />
-							Projects
-						</a>
-					</li> -->
 				</ul>
 			{/if}
 		</nav>
-		<div class="flex items-center gap-4">
-			<ColorThemeToggle />
+		<div class="flex items-center gap-2">
+			<div class="flex items-center">
+				<LanguageSwitcher />
+				<ColorThemeToggle />
+			</div>
 			{#if profile}
 				<div class="flex items-center gap-2">
 					{#if profile.full_name}
@@ -46,8 +44,10 @@
 			{:else}
 				<nav>
 					<ul class="flex items-center gap-4">
-						<li class="text-sm font-medium"><a href={ROUTES.auth.login}>Login</a></li>
-						<li class="text-sm font-medium"><a href={ROUTES.auth.signUp}>Sign up</a></li>
+						<li class="text-sm font-medium"><a href={ROUTES.auth.login}>{m.header_login()}</a></li>
+						<li class="text-sm font-medium">
+							<a href={ROUTES.auth.signUp}>{m.header_signup()}</a>
+						</li>
 					</ul>
 				</nav>
 			{/if}

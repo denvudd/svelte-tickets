@@ -9,20 +9,21 @@
 	import { Label } from '$lib/components/ui/label';
 	import PaintbrushIcon from '@lucide/svelte/icons/paintbrush';
 	import { mode, setMode } from 'mode-watcher';
+	import * as m from '$lib/paraglide/messages';
 	</script>
 
 <Card class="mx-auto w-full max-w-full">
 	<CardHeader>
-		<CardTitle>Appearance</CardTitle>
+		<CardTitle>{m.appearence_title()}</CardTitle>
 		<CardDescription
-			>Customize the appearance of the app. Automatically switch between day and night themes.</CardDescription
+			>{m.appearence_description()}</CardDescription
 		>
 	</CardHeader>
 	<CardContent class="space-y-6">
 		<div class="space-y-2">
 			<Label for="full_name" class="flex items-center gap-2 text-lg">
 				<PaintbrushIcon class="h-5 w-5" />
-				Theme
+				{m.appearence_theme()}
 			</Label>
 			<div class="grid max-w-md grid-cols-2 gap-8 pt-2">
 				<div>
@@ -47,7 +48,7 @@
 							</div>
 						</div>
 					</button>
-					<span class="block w-full p-2 text-center font-normal">Light</span>
+					<span class="block w-full p-2 text-center font-normal">{m.appearence_light()}</span>
 				</div>
 				<div>
 					<button
@@ -71,7 +72,7 @@
 							</div>
 						</div>
 					</button>
-					<span class="block w-full p-2 text-center font-normal">Dark</span>
+					<span class="block w-full p-2 text-center font-normal">{m.appearence_dark()}</span>
 				</div>
 			</div>
 		</div>

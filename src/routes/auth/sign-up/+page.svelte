@@ -21,6 +21,7 @@
 	} from '$lib/components/ui/tooltip/index.js';
 	import { cn } from '$lib/utils.js';
 	import { ROUTES } from '$lib/constants.js';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let { form } = $props();
 
@@ -35,15 +36,13 @@
 
 <Card class="mx-auto max-w-sm">
 	<CardHeader>
-		<CardTitle class="text-2xl">Sign up</CardTitle>
-		<CardDescription
-			>Enter your name, email and password below to create a new account</CardDescription
-		>
+		<CardTitle class="text-2xl">{m.signup_title()}</CardTitle>
+		<CardDescription>{m.signup_description()}</CardDescription>
 	</CardHeader>
 	<CardContent class="space-y-4">
 		<form method="POST" use:enhance action="?/signup" class="space-y-4">
 			<div class="grid gap-2">
-				<Label for="email">Name</Label>
+				<Label for="email">{m.signup_name_label()}</Label>
 				<Input
 					id="full_name"
 					name="full_name"
@@ -53,7 +52,7 @@
 			</div>
 
 			<div class="grid gap-2">
-				<Label for="email">Email</Label>
+				<Label for="email">{m.signup_email_label()}</Label>
 				<Input
 					id="email"
 					name="email"
@@ -63,7 +62,7 @@
 			</div>
 
 			<div class="grid gap-2">
-				<Label for="password">Password</Label>
+				<Label for="password">{m.signup_password_label()}</Label>
 				<Input
 					id="password"
 					type="password"
@@ -74,9 +73,9 @@
 			</div>
 
 			<div class="grid gap-2">
-				<Label for="role">Choose your role</Label>
+				<Label for="role">{m.signup_role_label()}</Label>
 				<RadioGroup name="role">
-					{#each USER_ROLES_DESCRIPTION as { role, label, description }}
+					{#each USER_ROLES_DESCRIPTION() as { role, label, description }}
 						<div class="flex items-center space-x-2">
 							<RadioGroupItem value={role} id={role} />
 							<Label for={role} class="inline-flex items-center gap-2 font-normal">
@@ -105,18 +104,18 @@
 				</RadioGroup>
 			</div>
 
-			<Button type="submit" class="w-full">Sign up</Button>
+			<Button type="submit" class="w-full">{m.signup_button()}</Button>
 		</form>
 		<form id="socials" method="POST" use:enhance>
 			<button
 				class={cn(buttonVariants({ variant: 'outline' }), 'w-full')}
 				formaction="?/signup&provider=google"
 			>
-				Login with Google
+				{m.signup_google()}
 			</button>
 		</form>
 		<div class="mt-4 text-center text-sm">
-			Already have an account? <a href={ROUTES.auth.login} class="underline">Login</a>
+			{m.signup_have_account()} <a href={ROUTES.auth.login} class="underline">{m.signup_login()}</a>
 		</div>
 	</CardContent>
 </Card>

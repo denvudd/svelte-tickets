@@ -6,6 +6,7 @@
 	import { Label } from '$lib/components/ui/label';
 	import { Input } from '$lib/components/ui/input';
 	import { Button } from '$lib/components/ui/button';
+	import * as m from '$lib/paraglide/messages';
 
 	interface Props {
 		emailForm: SuperValidated<Infer<typeof EmailManagementSchema>>;
@@ -35,15 +36,15 @@
 	<div class="mb-4 flex flex-col space-y-1.5">
 		<div class="flex items-center gap-2">
 			<MailIcon class="h-5 w-5" />
-			<h3 class="text-lg font-medium">Email</h3>
+			<h3 class="text-lg font-medium">{m.account_email_title()}</h3>
 		</div>
 		<p class="text-muted-foreground text-sm">
-			We'll send you a confirmation link to both the current and new email.
+			{m.account_email_description()}
 		</p>
 	</div>
 	<form method="POST" class="space-y-4" use:enhance action="?/email">
 		<div class="grid gap-2">
-			<Label for="new_email">New Email Address</Label>
+			<Label for="new_email">{m.account_new_email_label()}</Label>
 			<Input
 				type="email"
 				id="new_email"
@@ -54,15 +55,17 @@
 			/>
 			{#if showConfirmationMessage}
 				<p class="text-muted-foreground text-sm">
-					Confirmation link sent. Please check your inbox.
+					{m.account_confirmation_link()}
 				</p>
 			{/if}
 			{#if $form.new_email === currentUserEmail}
-				<p class="animate-in fade-in-30 slide-in-from-top flex flex-col gap-1 text-xs text-red-400">New email cannot be the same as current email.</p>
+				<p class="animate-in fade-in-30 slide-in-from-top flex flex-col gap-1 text-xs text-red-400">
+					{m.account_new_email_same()}
+				</p>
 			{/if}
 		</div>
 		<div class="flex w-full justify-end">
-			<Button type="submit">Update Email</Button>
+			<Button type="submit">{m.account_update_email()}</Button>
 		</div>
 	</form>
 </section>

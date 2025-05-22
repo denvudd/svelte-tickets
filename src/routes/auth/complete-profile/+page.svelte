@@ -19,6 +19,7 @@
 		TooltipProvider,
 		TooltipTrigger
 	} from '$lib/components/ui/tooltip';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let { form } = $props();
 
@@ -34,12 +35,12 @@
 <form method="POST" use:enhance action="?/completeProfile" class="space-y-6">
 	<Card class="mx-auto max-w-sm">
 		<CardHeader>
-			<CardTitle class="text-2xl">Complete your profile</CardTitle>
-			<CardDescription>Enter your name and choose a role for your profile</CardDescription>
+			<CardTitle class="text-2xl">{m.complete_profile_title()}</CardTitle>
+			<CardDescription>{m.complete_profile_description()}</CardDescription>
 		</CardHeader>
 		<CardContent class="space-y-4">
 			<div class="grid gap-2">
-				<Label for="email">Name</Label>
+				<Label for="email">{m.complete_profile_name_label()}</Label>
 				<Input
 					id="name"
 					name="name"
@@ -49,9 +50,9 @@
 			</div>
 
 			<div class="grid gap-2">
-				<Label for="role">Choose your role</Label>
+				<Label for="role">{m.complete_profile_role_label()}</Label>
 				<RadioGroup name="role">
-					{#each USER_ROLES_DESCRIPTION as { role, label, description }}
+					{#each USER_ROLES_DESCRIPTION() as { role, label, description }}
 						<div class="flex items-center space-x-2">
 							<RadioGroupItem value={role} id={role} />
 							<Label for={role} class="inline-flex items-center gap-2 font-normal">
@@ -80,7 +81,7 @@
 				</RadioGroup>
 			</div>
 
-			<Button type="submit" class="w-full">Confirm</Button>
+			<Button type="submit" class="w-full">{m.complete_profile_button()}</Button>
 		</CardContent>
 	</Card>
 </form>

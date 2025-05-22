@@ -8,6 +8,7 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Button } from '$lib/components/ui/button';
 	import { ROUTES } from '$lib/constants';
+	import * as m from '$lib/paraglide/messages';
 
 	interface Props {
 		passwordForm: SuperValidated<Infer<typeof PasswordManagementSchema>>;
@@ -33,11 +34,11 @@
 <section id="password-management">
 	<div class="mb-4 flex items-center gap-2">
 		<KeyIcon class="h-5 w-5" />
-		<h3 class="text-lg font-medium">Password</h3>
+		<h3 class="text-lg font-medium">{m.account_password_title()}</h3>
 	</div>
 	<form method="POST" class="space-y-4" use:enhance action="?/password">
 		<div class="grid gap-2">
-			<Label for="current_password">Current Password</Label>
+			<Label for="current_password">{m.account_current_password_label()}</Label>
 			<Input
 				type="password"
 				id="current_password"
@@ -47,11 +48,11 @@
 				error={$tainted?.current_password && $errors.current_password}
 			/>
 			<a class="ml-auto inline-block text-sm underline" href={ROUTES.auth.forgotPassword}
-				>Forgot your password?</a
+				>{m.account_forgot_password()}</a
 			>
 		</div>
 		<div class="grid gap-2">
-			<Label for="new_password">New Password</Label>
+			<Label for="new_password">{m.account_new_password_label()}</Label>
 			<Input
 				type="password"
 				id="new_password"
@@ -62,7 +63,7 @@
 			/>
 		</div>
 		<div class="grid gap-2">
-			<Label for="confirm_password">Confirm New Password</Label>
+			<Label for="confirm_password">{m.account_confirm_new_password_label()}</Label>
 			<Input
 				type="password"
 				id="confirm_password"
@@ -73,7 +74,7 @@
 			/>
 		</div>
 		<div class="flex w-full justify-end">
-			<Button type="submit">Update Password</Button>
+			<Button type="submit">{m.account_update_password()}</Button>
 		</div>
 	</form>
 </section>

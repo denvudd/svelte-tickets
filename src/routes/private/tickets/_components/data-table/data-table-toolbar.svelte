@@ -9,12 +9,6 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Button } from '$lib/components/ui/button';
 	import {
-		DropdownMenu,
-		DropdownMenuTrigger,
-		DropdownMenuContent,
-		DropdownMenuCheckboxItem
-	} from '$lib/components/ui/dropdown-menu';
-	import {
 		Tooltip,
 		TooltipContent,
 		TooltipProvider,
@@ -30,7 +24,6 @@
 		AlertDialogHeader,
 		AlertDialogTitle
 	} from '$lib/components/ui/alert-dialog';
-	import Settings2Icon from '@lucide/svelte/icons/settings-2';
 	import TrashIcon from '@lucide/svelte/icons/trash';
 	import { type Tables } from '$lib/database.types';
 	import { applyAction, enhance } from '$app/forms';
@@ -43,6 +36,7 @@
 	import { goto, invalidate } from '$app/navigation';
 	import { page } from '$app/state';
 	import { onMount } from 'svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	interface Props {
 		table: Table<TData>;
@@ -130,7 +124,7 @@
 <div class="flex items-center justify-between">
 	<div class="flex flex-1 items-center space-x-2">
 		<Input
-			placeholder="Filter tickets..."
+			placeholder={m.tickets_search_placeholder()}
 			value={(titleCol?.getFilterValue() as string) ?? ''}
 			oninput={(e) => {
 				titleCol?.setFilterValue(e.currentTarget.value);
@@ -150,37 +144,41 @@
 							onclick={() => (isDeleteDialogOpen = true)}
 							variant="outline"
 							size="icon"
-							class="flex-shrink-0 size-8"
+							class="size-8 flex-shrink-0"
 						>
 							<TrashIcon />
 						</Button>
 					</TooltipTrigger>
-					<TooltipContent class="max-w-xs">Delete selected rows</TooltipContent>
+					<TooltipContent class="max-w-xs">{m.tickets_delete_selected()}</TooltipContent>
 				</Tooltip>
 			</TooltipProvider>
 		{/if}
 
 		{#if statusCol}
-			<DataTableFacetedFilter column={statusCol} title="Status" options={TICKETS_STATUS_OPTIONS} />
+			<DataTableFacetedFilter
+				column={statusCol}
+				title={m.tickets_status()}
+				options={TICKETS_STATUS_OPTIONS()}
+			/>
 		{/if}
 		{#if priorityCol}
 			<DataTableFacetedFilter
 				column={priorityCol}
-				title="Priority"
-				options={TICKET_PRIORITY_OPTIONS}
+				title={m.tickets_priority()}
+				options={TICKET_PRIORITY_OPTIONS()}
 			/>
 		{/if}
 		{#if categoryCol}
 			<DataTableFacetedFilter
 				column={categoryCol}
-				title="Category"
-				options={TICKET_CATEGORY_OPTIONS}
+				title={m.tickets_category()}
+				options={TICKET_CATEGORY_OPTIONS()}
 			/>
 		{/if}
 
 		{#if isFiltered}
 			<Button variant="ghost" onclick={() => resetFilters()} class="h-8 px-2 lg:px-3">
-				Reset
+				{m.tickets_reset()}
 				<XIcon />
 			</Button>
 		{/if}
@@ -196,10 +194,10 @@
 				return async ({ result }) => {
 					console.log('🚀 ~ return ~ result:', result);
 					if (result.status === 200) {
-						toast.success('Tickets deleted successfully');
+						toast.success(m.tickets_delete_success());
 					} else {
 						toast.error(
-							(result as { data: { message?: string } }).data.message || 'Failed to delete tickets'
+							(result as { data: { message?: string } }).data.message || m.tickets_delete_failed()
 						);
 					}
 
@@ -217,17 +215,16 @@
 			action={`?/deleteTicket&ticketId=${selectedRows.map((row) => (row.original as Tables<'tickets'>).id)}`}
 		>
 			<AlertDialogHeader>
-				<AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+				<AlertDialogTitle>{m.tickets_delete_confirm_title()}</AlertDialogTitle>
 				<AlertDialogDescription>
-					This action cannot be undone. This will permanently delete selected tickets and remove the
-					data from our servers.
+					{m.tickets_delete_confirm_description()}
 				</AlertDialogDescription>
 			</AlertDialogHeader>
 			<AlertDialogFooter>
 				<AlertDialogCancel onclick={handleToggleDeleteDialog} type="button"
-					>Cancel</AlertDialogCancel
+					>{m.tickets_delete_confirm_cancel()}</AlertDialogCancel
 				>
-				<AlertDialogAction type="submit">Continue</AlertDialogAction>
+				<AlertDialogAction type="submit">{m.tickets_delete_confirm_confirm()}</AlertDialogAction>
 			</AlertDialogFooter>
 		</form>
 	</AlertDialogContent>

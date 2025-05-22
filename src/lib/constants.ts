@@ -10,6 +10,8 @@ import BugIcon from '@lucide/svelte/icons/bug';
 import GitBranchIcon from '@lucide/svelte/icons/git-branch';
 import CircleHelpIcon from '@lucide/svelte/icons/circle-help';
 
+import * as m from '$lib/paraglide/messages.js';
+
 export const OAUTH_PROVIDERS = ['google'];
 
 export const ROUTES = {
@@ -56,65 +58,65 @@ export enum TicketCategory {
 	Question = 'question'
 }
 
-export const TICKETS_STATUS_OPTIONS = [
+export const TICKETS_STATUS_OPTIONS = () => [
 	{
 		value: TicketStatus.Open,
-		label: 'Open',
-        Icon: Circle,
-        iconColor: "text-green-500",
+		label: m.status_open(),
+		Icon: Circle,
+		iconColor: 'text-green-500'
 	},
 	{
 		value: TicketStatus.InProgress,
-		label: 'In Progress',
-        Icon: CircleDashed,
-        iconColor: "text-yellow-500",
+		label: m.status_in_progress(),
+		Icon: CircleDashed,
+		iconColor: 'text-yellow-500'
 	},
 	{
 		value: TicketStatus.Closed,
-		label: 'Closed',
-        Icon: Ban,
-        iconColor: "text-red-500",
+		label: m.status_closed(),
+		Icon: Ban,
+		iconColor: 'text-red-500'
 	}
 ];
 
-export const TICKET_PRIORITY_OPTIONS = [
+export const TICKET_PRIORITY_OPTIONS = () => [
 	{
 		value: TicketPriority.Low,
-		label: 'Low',
-        Icon: SignalLowIcon,
-        iconColor: "text-green-500",
+		label: m.priority_low(),
+		Icon: SignalLowIcon,
+		iconColor: 'text-green-500'
 	},
 	{
 		value: TicketPriority.Medium,
-		label: 'Medium',
-        Icon: SignalMediumIcon,
-        iconColor: "text-yellow-500",
+		label: m.priority_medium(),
+		Icon: SignalMediumIcon,
+		iconColor: 'text-yellow-500'
 	},
 	{
 		value: TicketPriority.High,
-		label: 'High',
-        Icon: SignalHighIcon,
-        iconColor: "text-red-500",
+		label: m.priority_high(),
+		Icon: SignalHighIcon,
+		iconColor: 'text-red-500'
 	}
 ];
 
-export const TICKET_CATEGORY_OPTIONS = [
+export const TICKET_CATEGORY_OPTIONS = () => [
 	{
 		value: TicketCategory.Bug,
-		label: 'Bug',
-         Icon: BugIcon,
-        iconColor: "text-red-500",
+		label: m.category_bug(),
+		Icon: BugIcon,
+		iconColor: 'text-red-500'
 	},
 	{
 		value: TicketCategory.Feature,
-		label: 'Feature',
-         Icon: GitBranchIcon,
-        iconColor: "text-green-500",
+		label: m.category_feature(),
+		Icon: GitBranchIcon,
+		iconColor: 'text-green-500'
 	},
 	{
 		value: TicketCategory.Question,
-		label: 'Question',
-         Icon: CircleHelpIcon,
-        iconColor: "text-yellow-500",
+		label: m.category_question(),
+		Icon: CircleHelpIcon,
+		iconColor: 'text-yellow-500'
 	}
 ];

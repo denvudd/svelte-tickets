@@ -18,7 +18,8 @@
 	import { Avatar, AvatarFallback, AvatarImage } from '$lib/components/ui/avatar';
 	import type { Tables } from '$lib/database.types';
 	import { toast } from 'svelte-sonner';
-	import { goto, invalidate } from '$app/navigation';
+	import { invalidate } from '$app/navigation';
+	import * as m from '$lib/paraglide/messages.js';
 
 	interface Props {
 		profiles: Tables<'profiles'>[] | undefined;
@@ -48,20 +49,19 @@
 
 <Dialog open={isDialogOpen} onOpenChange={onDialogOpenChange}>
 	<DialogTrigger class={buttonVariants()}>
-		<PlusIcon class="size-4" /> New Chat
+		<PlusIcon class="size-4" />
+		{m.messages_create_title()}
 	</DialogTrigger>
 	<DialogContent>
 		<DialogHeader>
-			<DialogTitle>New Chat</DialogTitle>
-			<DialogDescription
-				>Search for a user to start a new conversation with your team members.</DialogDescription
-			>
+			<DialogTitle>{m.messages_create_title()}</DialogTitle>
+			<DialogDescription>{m.messages_create_description()}</DialogDescription>
 		</DialogHeader>
 
 		<div class="space-y-6">
 			<form class="w-full" data-sveltekit-keepfocus data-sveltekit-noscroll>
 				<div class="grid gap-2">
-					<Label for="q">Title</Label>
+					<Label for="q">{m.messages_create_title_label()}</Label>
 					<Input id="q" name="q" placeholder="e.g Alex" oninput={handleInput} value={query} />
 				</div>
 			</form>
@@ -75,19 +75,19 @@
 
 							if (result.type === 'redirect') {
 								window.location.href = result.location;
-								toast.success('Chat created!');
+								toast.success(m.messages_create_success());
 								return;
 							} else {
 								await applyAction(result);
 							}
 
 							if (result.status === 200) {
-								toast.success('Chat created!');
+								toast.success(m.messages_create_success());
 								invalidate('chats');
 							} else {
 								toast.error(
 									(result as { data?: { message?: string } }).data?.message ||
-										'Failed to create chat'
+										m.messages_create_failed()
 								);
 							}
 						};
@@ -116,7 +116,7 @@
 					{/each}
 				</form>
 			{:else}
-				<p class="text-muted-foreground w-full text-center text-sm">No users found.</p>
+				<p class="text-muted-foreground w-full text-center text-sm">{m.messages_create_empty()}</p>
 			{/if}
 		</div>
 	</DialogContent>

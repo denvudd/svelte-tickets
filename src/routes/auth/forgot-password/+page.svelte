@@ -10,6 +10,7 @@
 		CardDescription
 	} from '$lib/components/ui/card';
 	import { enhance } from '$app/forms';
+	import * as m from '$lib/paraglide/messages';
 
 	let { form } = $props();
 
@@ -25,13 +26,13 @@
 <form method="POST" use:enhance action="?/forgotPassword">
 	<Card class="mx-auto max-w-sm">
 		<CardHeader>
-			<CardTitle class="text-2xl">Forgot Password</CardTitle>
-			<CardDescription>Enter your email address to receive a password reset link.</CardDescription>
+			<CardTitle class="text-2xl">{m.forgot_password_title()}</CardTitle>
+			<CardDescription>{m.forgot_password_description()}</CardDescription>
 		</CardHeader>
 		<CardContent>
 			<div class="space-y-4">
 				<div class="grid gap-2">
-					<Label for="email">Email</Label>
+					<Label for="email">{m.forgot_password_email_label()}</Label>
 					<Input
 						id="email"
 						name="email"
@@ -39,7 +40,7 @@
 						error={errors.email}
 					/>
 				</div>
-				<Button type="submit" class="w-full">Send Reset Link</Button>
+				<Button type="submit" class="w-full">{m.forgot_password_button()}</Button>
 			</div>
 		</CardContent>
 	</Card>

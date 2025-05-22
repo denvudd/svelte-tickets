@@ -7,6 +7,9 @@
 	import { onMount } from 'svelte';
 	import { invalidate } from '$app/navigation';
 	import type { Tables } from '$lib/database.types';
+	import * as m from '$lib/paraglide/messages.js';
+	import { languageTag } from '$lib/paraglide/runtime';
+	import uaLocale from 'dayjs/locale/uk.js';
 
 	dayjs.extend(relativeTime);
 
@@ -97,7 +100,7 @@
 
 <div class="flex w-full flex-col gap-4">
 	<div class="flex items-center justify-between">
-		<h1 class="text-lg font-medium">Messages</h1>
+		<h1 class="text-lg font-medium">{m.messages_title()}</h1>
 		<CreateChat {profiles} />
 	</div>
 
@@ -118,7 +121,9 @@
 								<div class="truncate font-medium">{chat.profile.full_name}</div>
 								<div class="text-muted-foreground flex-none text-xs">
 									{chat.last_message?.created_at
-										? dayjs(chat.last_message.created_at).fromNow()
+										? dayjs(chat.last_message.created_at, {
+												locale: languageTag() === "ua" ? uaLocale : undefined
+											}).fromNow()
 										: ''}
 								</div>
 							</div>
@@ -127,7 +132,7 @@
 									{#if chat.last_message?.profile_id === profile?.id}
 										<strong>You:</strong>
 									{/if}
-									{chat.last_message?.content || 'No messages yet'}
+									{chat.last_message?.content || m.messages_chat_empty()}
 								</span>
 								{#if chat.unread_count > 0}
 									<span
@@ -141,7 +146,7 @@
 				</li>
 			{/each}
 		{:else}
-			<li class="text-muted-foreground py-4 text-center">No conversations yet</li>
+			<li class="text-muted-foreground py-4 text-center">{m.messages_empty()}</li>
 		{/if}
 	</ul>
 </div>

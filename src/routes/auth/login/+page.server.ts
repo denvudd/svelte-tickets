@@ -6,6 +6,7 @@ import type { Actions } from './$types';
 import type { Provider } from '@supabase/supabase-js';
 import { OAUTH_PROVIDERS } from '$lib/constants';
 import { ROUTES } from '$lib/constants';
+import { PUBLIC_DOMAIN } from '$env/static/public';
 
 const LoginSchema = z.object({
 	email: z.string().email({ message: 'Invalid email address' }),
@@ -27,7 +28,7 @@ export const actions: Actions = {
 			const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
 				provider: provider, 
 				options: {
-					redirectTo: 'http://localhost:5173/auth/callback'
+					redirectTo: `${PUBLIC_DOMAIN}${ROUTES.auth.callback}`
 				}
 			});
 

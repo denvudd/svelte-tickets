@@ -8,16 +8,50 @@
 	import { DataTableFacetedFilter, DataTableViewOptions } from './index.js';
 	import { Input } from '$lib/components/ui/input';
 	import { Button } from '$lib/components/ui/button';
-	import { TICKET_CATEGORY_OPTIONS, TICKET_PRIORITY_OPTIONS, TICKETS_STATUS_OPTIONS } from '$lib/constants.js';
-	import { goto } from '$app/navigation';
+	import {
+		DropdownMenu,
+		DropdownMenuTrigger,
+		DropdownMenuContent,
+		DropdownMenuCheckboxItem
+	} from '$lib/components/ui/dropdown-menu';
+	import {
+		Tooltip,
+		TooltipContent,
+		TooltipProvider,
+		TooltipTrigger
+	} from '$lib/components/ui/tooltip';
+	import {
+		AlertDialog,
+		AlertDialogAction,
+		AlertDialogCancel,
+		AlertDialogContent,
+		AlertDialogDescription,
+		AlertDialogFooter,
+		AlertDialogHeader,
+		AlertDialogTitle
+	} from '$lib/components/ui/alert-dialog';
+	import Settings2Icon from '@lucide/svelte/icons/settings-2';
+	import TrashIcon from '@lucide/svelte/icons/trash';
+	import { type Tables } from '$lib/database.types';
+	import { applyAction, enhance } from '$app/forms';
+	import { toast } from 'svelte-sonner';
+	import {
+		TICKET_CATEGORY_OPTIONS,
+		TICKET_PRIORITY_OPTIONS,
+		TICKETS_STATUS_OPTIONS
+	} from '$lib/constants.js';
+	import { goto, invalidate } from '$app/navigation';
 	import { page } from '$app/state';
 	import { onMount } from 'svelte';
 
 	interface Props {
 		table: Table<TData>;
+		resetSelectedRows: () => void;
 	}
 
-	let { table }: Props = $props();
+	let { table, resetSelectedRows }: Props = $props();
+
+	let isDeleteDialogOpen = $state(false);
 
 	const isFiltered = $derived(table.getState().columnFilters.length > 0);
 	const statusCol = $derived(table.getColumn('status'));
@@ -25,22 +59,24 @@
 	const categoryCol = $derived(table.getColumn('category'));
 	const titleCol = $derived(table.getColumn('title'));
 
+	const selectedRows = $derived(table.getFilteredSelectedRowModel().rows);
+
 	function updateSearchParams() {
 		const url = new URL(window.location.href);
 		const filters = table.getState().columnFilters;
-		
+
 		url.searchParams.delete('status');
 		url.searchParams.delete('priority');
 		url.searchParams.delete('category');
 		url.searchParams.delete('title');
-		
-		filters.forEach(filter => {
+
+		filters.forEach((filter) => {
 			const columnId = filter.id;
 			const value = filter.value;
-			
+
 			if (columnId === 'status' || columnId === 'priority' || columnId === 'category') {
 				if (Array.isArray(value) && value.length > 0) {
-					value.forEach(val => {
+					value.forEach((val) => {
 						url.searchParams.append(columnId, val);
 					});
 				}
@@ -48,18 +84,18 @@
 				url.searchParams.set(columnId, value as string);
 			}
 		});
-		
+
 		goto(url.toString(), { replaceState: true, noScroll: true });
 	}
 
 	onMount(() => {
 		const searchParams = page.url.searchParams;
-		
+
 		const statusValues = searchParams.getAll('status');
 		if (statusValues.length > 0 && statusCol) {
 			statusCol.setFilterValue(statusValues);
 		}
-		
+
 		const priorityValues = searchParams.getAll('priority');
 		if (priorityValues.length > 0 && priorityCol) {
 			priorityCol.setFilterValue(priorityValues);
@@ -69,7 +105,7 @@
 		if (categoryValues.length > 0 && categoryCol) {
 			categoryCol.setFilterValue(categoryValues);
 		}
-		
+
 		const titleValue = searchParams.get('title');
 		if (titleValue && titleCol) {
 			titleCol.setFilterValue(titleValue);
@@ -81,12 +117,14 @@
 			const filters = table.getState().columnFilters;
 			updateSearchParams();
 		}
-	})
+	});
 
 	function resetFilters() {
 		table.resetColumnFilters();
 		updateSearchParams();
 	}
+
+	const handleToggleDeleteDialog = () => (isDeleteDialogOpen = !isDeleteDialogOpen);
 </script>
 
 <div class="flex items-center justify-between">
@@ -103,6 +141,24 @@
 			rootClass="w-[150px] lg:w-[250px]"
 			class="h-8"
 		/>
+
+		{#if selectedRows.length}
+			<TooltipProvider delayDuration={100}>
+				<Tooltip>
+					<TooltipTrigger>
+						<Button
+							onclick={() => (isDeleteDialogOpen = true)}
+							variant="outline"
+							size="icon"
+							class="flex-shrink-0 size-8"
+						>
+							<TrashIcon />
+						</Button>
+					</TooltipTrigger>
+					<TooltipContent class="max-w-xs">Delete selected rows</TooltipContent>
+				</Tooltip>
+			</TooltipProvider>
+		{/if}
 
 		{#if statusCol}
 			<DataTableFacetedFilter column={statusCol} title="Status" options={TICKETS_STATUS_OPTIONS} />
@@ -131,3 +187,48 @@
 	</div>
 	<DataTableViewOptions {table} />
 </div>
+
+<AlertDialog open={isDeleteDialogOpen} onOpenChange={handleToggleDeleteDialog}>
+	<AlertDialogContent>
+		<form
+			method="POST"
+			use:enhance={({ formElement, formData, action, cancel }) => {
+				return async ({ result }) => {
+					console.log('🚀 ~ return ~ result:', result);
+					if (result.status === 200) {
+						toast.success('Tickets deleted successfully');
+					} else {
+						toast.error(
+							(result as { data: { message?: string } }).data.message || 'Failed to delete tickets'
+						);
+					}
+
+					isDeleteDialogOpen = false;
+					resetSelectedRows();
+					invalidate('tickets');
+
+					if (result.type === 'redirect') {
+						goto(result.location);
+					} else {
+						await applyAction(result);
+					}
+				};
+			}}
+			action={`?/deleteTicket&ticketId=${selectedRows.map((row) => (row.original as Tables<'tickets'>).id)}`}
+		>
+			<AlertDialogHeader>
+				<AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+				<AlertDialogDescription>
+					This action cannot be undone. This will permanently delete selected tickets and remove the
+					data from our servers.
+				</AlertDialogDescription>
+			</AlertDialogHeader>
+			<AlertDialogFooter>
+				<AlertDialogCancel onclick={handleToggleDeleteDialog} type="button"
+					>Cancel</AlertDialogCancel
+				>
+				<AlertDialogAction type="submit">Continue</AlertDialogAction>
+			</AlertDialogFooter>
+		</form>
+	</AlertDialogContent>
+</AlertDialog>

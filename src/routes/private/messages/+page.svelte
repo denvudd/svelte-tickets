@@ -102,7 +102,7 @@
 	</div>
 
 	<ul class="space-y-2">
-		{#if chats}
+		{#if chats && chats.length}
 			{#each chats as chat}
 				<li>
 					<a

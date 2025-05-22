@@ -3,7 +3,7 @@ import { zod as zodAdapter } from 'sveltekit-superforms/adapters';
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 import { EmailManagementSchema, PasswordManagementSchema } from './schema';
-import { PUBLIC_SUPABASE_URL } from '$env/static/public';
+import { PUBLIC_DOMAIN, PUBLIC_SUPABASE_URL } from '$env/static/public';
 import { SUPABASE_SERVICE_ROLE_KEY } from '$env/static/private';
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '$lib/database.types';
@@ -68,7 +68,7 @@ export const actions: Actions = {
 				email: form.data.new_email
 			},
 			{
-				emailRedirectTo: `http://localhost:5173${ROUTES.auth.emailChanging}`
+				emailRedirectTo: `${PUBLIC_DOMAIN}${ROUTES.auth.emailChanging}`
 			}
 		);
 

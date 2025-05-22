@@ -9,6 +9,7 @@ import type { TablesInsert } from '$lib/database.types';
 import { OAUTH_PROVIDERS } from '$lib/constants';
 import type { Provider } from '@supabase/supabase-js';
 import { ROUTES } from '$lib/constants';
+import { PUBLIC_DOMAIN } from '$env/static/public';
 
 const defaultRoles = UserRoleManager.getAllRolesExcept(UserRole.Admin);
 
@@ -49,7 +50,7 @@ export const actions: Actions = {
 			const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
 				provider: provider,
 				options: {
-					redirectTo: 'http://localhost:5173/auth/callback'
+					redirectTo: `${PUBLIC_DOMAIN}${ROUTES.auth.callback}`
 				}
 			});
 

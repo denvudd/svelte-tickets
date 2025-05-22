@@ -175,6 +175,7 @@ export const actions: Actions = {
 
 		return message(form, { message: 'Ticket created successfully!', status: 201 });
 	},
+
 	editTicket: async ({ request, locals: { supabase, profile }, url }) => {
 		if (!profile) throw redirect(303, ROUTES.auth.login);
 
@@ -213,7 +214,6 @@ export const actions: Actions = {
 		if (!profile) throw redirect(303, ROUTES.auth.login);
 
 		const ticketIdParam = url.searchParams.get('ticketId');
-		console.log('🚀 ~ deleteTicket: ~ ticketIdParam:', ticketIdParam);
 
 		if (!ticketIdParam) {
 			return fail(404, {

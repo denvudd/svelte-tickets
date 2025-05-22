@@ -59,8 +59,9 @@ export const getChatsList = async <Response = Tables<'chats'>>(
 
 export const createChat = async (supabase: SupabaseClient, data: TablesInsert<'chats'> | TablesInsert<'chats'>[]) => {
 	const response: PostgrestSingleResponse<Tables<'chats'>> = await supabase
-		.from('messages')
+		.from('chats')
 		.insert(data)
+		.eq('created_by', Array.isArray(data) ? data[0].created_by : data.created_by)
 		.select('*')
 		.single();
 

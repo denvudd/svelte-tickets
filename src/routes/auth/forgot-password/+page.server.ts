@@ -4,6 +4,7 @@ import { zod as zodAdapter } from 'sveltekit-superforms/adapters';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 import { ROUTES } from '$lib/constants';
+import { PUBLIC_DOMAIN } from '$env/static/public';
 
 const ForgotPasswordSchema = z.object({
 	email: z.string().email({ message: 'Invalid email address' })
@@ -20,7 +21,7 @@ export const actions: Actions = {
 		const { email } = form.data;
 
 		const { error: forgotPasswordError } = await supabase.auth.resetPasswordForEmail(email, {
-			redirectTo: 'http://localhost:5173/auth/reset-password'
+			redirectTo: `${PUBLIC_DOMAIN}${ROUTES.auth.resetPassword}`
 		});
 
 		if (forgotPasswordError) {

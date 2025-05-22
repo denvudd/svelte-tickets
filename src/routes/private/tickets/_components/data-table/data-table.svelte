@@ -23,33 +23,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { Select, SelectContent, SelectItem, SelectTrigger } from '$lib/components/ui/select';
-	import {
-		DropdownMenu,
-		DropdownMenuTrigger,
-		DropdownMenuContent,
-		DropdownMenuCheckboxItem
-	} from '$lib/components/ui/dropdown-menu';
-	import {
-		Tooltip,
-		TooltipContent,
-		TooltipProvider,
-		TooltipTrigger
-	} from '$lib/components/ui/tooltip';
-	import {
-		AlertDialog,
-		AlertDialogAction,
-		AlertDialogCancel,
-		AlertDialogContent,
-		AlertDialogDescription,
-		AlertDialogFooter,
-		AlertDialogHeader,
-		AlertDialogTitle
-	} from '$lib/components/ui/alert-dialog';
-	import Settings2Icon from '@lucide/svelte/icons/settings-2';
-	import TrashIcon from '@lucide/svelte/icons/trash';
-	import { type Tables } from '$lib/database.types';
-	import { applyAction, enhance } from '$app/forms';
-	import { toast } from 'svelte-sonner';
+
 	import { goto, invalidate } from '$app/navigation';
 	import { page } from '$app/state';
 	import DataTableToolbar from './data-table-toolbar.svelte';
@@ -88,8 +62,6 @@
 	let columnFilters = $state<ColumnFiltersState>([]);
 	let columnVisibility = $state<VisibilityState>({});
 	let rowSelection = $state<RowSelectionState>({});
-
-	let isDeleteDialogOpen = $state(false);
 
 	const table = createSvelteTable({
 		get data() {
@@ -169,8 +141,6 @@
 		}
 	});
 
-	const handleToggleDeleteDialog = () => (isDeleteDialogOpen = !isDeleteDialogOpen);
-
 	const selectedRows = $derived(table.getFilteredSelectedRowModel().rows);
 
 	const totalPages = $derived(Math.ceil(totalCount / pagination.pageSize));
@@ -180,7 +150,7 @@
 </script>
 
 <div class="space-y-4">
-	<DataTableToolbar {table} />
+	<DataTableToolbar {table} resetSelectedRows={() => (rowSelection = {})} />
 	<div class="rounded-md border">
 		<Table>
 			<TableHeader>
@@ -267,48 +237,3 @@
 		</div>
 	</div>
 </div>
-
-<AlertDialog open={isDeleteDialogOpen} onOpenChange={handleToggleDeleteDialog}>
-	<AlertDialogContent>
-		<form
-			method="POST"
-			use:enhance={({ formElement, formData, action, cancel }) => {
-				return async ({ result }) => {
-					console.log('🚀 ~ return ~ result:', result);
-					if (result.status === 200) {
-						toast.success('Tickets deleted successfully');
-					} else {
-						toast.error(
-							(result as { data: { message?: string } }).data.message || 'Failed to delete tickets'
-						);
-					}
-
-					isDeleteDialogOpen = false;
-					rowSelection = {};
-					invalidate('tickets');
-
-					if (result.type === 'redirect') {
-						goto(result.location);
-					} else {
-						await applyAction(result);
-					}
-				};
-			}}
-			action={`?/deleteTicket&ticketId=${selectedRows.map((row) => (row.original as Tables<'tickets'>).id)}`}
-		>
-			<AlertDialogHeader>
-				<AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-				<AlertDialogDescription>
-					This action cannot be undone. This will permanently delete selected tickets and remove the
-					data from our servers.
-				</AlertDialogDescription>
-			</AlertDialogHeader>
-			<AlertDialogFooter>
-				<AlertDialogCancel onclick={handleToggleDeleteDialog} type="button"
-					>Cancel</AlertDialogCancel
-				>
-				<AlertDialogAction type="submit">Continue</AlertDialogAction>
-			</AlertDialogFooter>
-		</form>
-	</AlertDialogContent>
-</AlertDialog>

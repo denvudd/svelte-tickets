@@ -71,16 +71,24 @@
 					method="POST"
 					use:enhance={({ formElement, formData, action, cancel }) => {
 						return async ({ result }) => {
-							if (result.status === 200) {
-								invalidate('chats');
-								onDialogOpenChange(false);
-								toast.success('Chat created!');
-							}
+							onDialogOpenChange(false);
 
 							if (result.type === 'redirect') {
-								goto(result.location);
+								window.location.href = result.location;
+								toast.success('Chat created!');
+								return;
 							} else {
 								await applyAction(result);
+							}
+
+							if (result.status === 200) {
+								toast.success('Chat created!');
+								invalidate('chats');
+							} else {
+								toast.error(
+									(result as { data?: { message?: string } }).data?.message ||
+										'Failed to create chat'
+								);
 							}
 						};
 					}}
@@ -108,7 +116,7 @@
 					{/each}
 				</form>
 			{:else}
-				<p class="text-muted-foreground text-sm w-full text-center">No users found.</p>
+				<p class="text-muted-foreground w-full text-center text-sm">No users found.</p>
 			{/if}
 		</div>
 	</DialogContent>

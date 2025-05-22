@@ -25,12 +25,12 @@
 							Tickets
 						</a>
 					</li>
-					<li class="text-sm font-medium">
+					<!-- <li class="text-sm font-medium">
 						<a href={ROUTES.private.projects} class="flex items-center gap-2">
 							<PresentationIcon class="h-4 w-4" />
 							Projects
 						</a>
-					</li>
+					</li> -->
 				</ul>
 			{/if}
 		</nav>

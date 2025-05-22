@@ -58,11 +58,10 @@ export const getChatMembersList = async <Response = Tables<'chat_members'>>(
 };
 
 export const createChatMembers = async (supabase: SupabaseClient, data: TablesInsert<'chat_members'> | TablesInsert<'chat_members'>[]) => {
-	const response: PostgrestSingleResponse<Tables<'chat_members'>> = await supabase
+	const response: PostgrestSingleResponse<Tables<'chat_members'>[]> = await supabase
 		.from('chat_members')
 		.insert(data)
 		.select('*')
-		.single();
 
 	return response;
 };

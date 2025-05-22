@@ -17,6 +17,8 @@
 	import { Avatar, AvatarImage, AvatarFallback } from '$lib/components/ui/avatar';
 	import type { Tables } from '$lib/database.types';
 	import { ROUTES } from '$lib/constants';
+	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
 
 	interface Props {
 		profile: Tables<'profiles'>;
@@ -27,6 +29,82 @@
 	const { full_name, avatar_url } = $derived(profile);
 
 	const avatarShortcut = full_name?.slice(0, 2).toUpperCase();
+
+	function checkShortcut(event: KeyboardEvent, targetCode: string, modifiers: string[]): boolean {
+		const hasAllModifiers = modifiers.every((mod) => {
+			switch (mod) {
+				case '⌘':
+				case 'cmd':
+					return event.metaKey || event.ctrlKey;
+				case '⇧':
+				case 'shift':
+					return event.shiftKey;
+				case '⌥':
+				case 'alt':
+					return event.altKey;
+				default:
+					return false;
+			}
+		});
+
+		const keyMatches = event.code === targetCode;
+
+		return hasAllModifiers && keyMatches;
+	}
+
+	function handleGlobalKeydown(event: KeyboardEvent) {
+		const target = event.target as HTMLElement;
+		if (
+			target?.tagName === 'INPUT' ||
+			target?.tagName === 'TEXTAREA' ||
+			target?.contentEditable === 'true'
+		) {
+			return;
+		}
+
+		// ⇧⌘P (Shift + Cmd + P)
+		if (checkShortcut(event, 'KeyP', ['shift', 'cmd'])) {
+			event.preventDefault();
+			goto(ROUTES.private.account.profile);
+			return;
+		}
+
+		// ⌘S (Cmd + S)
+		if (checkShortcut(event, 'KeyS', ['cmd'])) {
+			event.preventDefault();
+			goto(ROUTES.private.account.settings);
+			return;
+		}
+
+		// ⌘A (Cmd + A)
+		if (checkShortcut(event, 'KeyA', ['cmd'])) {
+			event.preventDefault();
+			goto(ROUTES.private.account.appearence);
+			return;
+		}
+
+		// ⌘M (Cmd + M)
+		if (checkShortcut(event, 'KeyM', ['cmd'])) {
+			event.preventDefault();
+			goto(ROUTES.private.messages);
+			return;
+		}
+
+		// ⇧⌘Q (Shift + Cmd + Q)
+		if (checkShortcut(event, 'KeyQ', ['shift', 'cmd'])) {
+			event.preventDefault();
+			handleLogout();
+			return;
+		}
+	}
+
+	onMount(() => {
+		document.addEventListener('keydown', handleGlobalKeydown);
+
+		return () => {
+			document.removeEventListener('keydown', handleGlobalKeydown);
+		};
+	});
 </script>
 
 <DropdownMenu>

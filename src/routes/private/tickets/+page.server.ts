@@ -102,8 +102,6 @@ export async function load({ locals: { supabase, profile }, url, depends }) {
 		});
 	}
 
-	console.log('🚀 ~ load ~ filters:', filters);
-
 	const { data: tickets } = await getAllTickets<TicketsWithProfile>(supabase, {
 		select:
 			'id, title, description, status, priority, category, created_at, owner_id, profiles!tickets_owner_id_fkey(id, full_name)',
@@ -112,7 +110,6 @@ export async function load({ locals: { supabase, profile }, url, depends }) {
 		offset: offset,
 		filters: filters
 	});
-	console.log('🚀 ~ load ~ tickets:', tickets);
 
 	const isEditableTicket = ticketId ? ticket && ticket.owner_id === profile.id : true;
 

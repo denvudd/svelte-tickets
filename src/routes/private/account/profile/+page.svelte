@@ -39,7 +39,7 @@
 		}
 	});
 
-	const avatarShortcut = profile?.full_name?.slice(0, 2).toUpperCase();
+	const avatarShortcut = $derived(profile?.full_name?.slice(0, 2).toUpperCase());
 	const file = fileProxy(form, 'avatar');
 
 	$effect(() => {
@@ -66,8 +66,11 @@
 		<CardContent class="space-y-6">
 			<div class="flex flex-col items-center space-y-4">
 				<Avatar class="h-24 w-24">
-					<AvatarImage src={previewUrl || profile?.avatar_url || ''} alt={profile?.full_name} />
-					<AvatarFallback class="bg-muted text-2xl">{avatarShortcut}</AvatarFallback>
+					<AvatarImage
+						src={previewUrl || profile?.avatar_url || undefined}
+						alt={profile?.full_name}
+					/>
+					<AvatarFallback class="text-2xl">{avatarShortcut}</AvatarFallback>
 				</Avatar>
 				<div class="flex items-center">
 					<input

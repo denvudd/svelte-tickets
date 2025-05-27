@@ -22,8 +22,9 @@
 	}
 
 	let { id, owner_id }: Props = $props();
+	$inspect("🚀 ~ id:", id)
 	const isOwner = $derived(owner_id === page.data.profile?.id);
-	const stringifiedId = String(id);
+	const stringifiedId = $derived(String(id));
 
 	const params = queryParameters();
 
@@ -57,7 +58,7 @@
 			const parsed = JSON.parse(response.data);
 			const message = parsed[1];
 
-			if (response?.data?.status === 200) {
+			if (response?.status === 200) {
 				toast.success(message);
 			} else {
 				toast.error(message);
@@ -86,7 +87,9 @@
 			<DropdownMenuItem onclick={handleCopyTicketId}>{m.tickets_actions_copy()}</DropdownMenuItem>
 		</DropdownMenuGroup>
 		<DropdownMenuSeparator />
-		<DropdownMenuItem onclick={handleEditTicket}>{isOwner ? m.tickets_actions_edit() : m.tickets_actions_view()}</DropdownMenuItem>
+		<DropdownMenuItem onclick={handleEditTicket}
+			>{isOwner ? m.tickets_actions_edit() : m.tickets_actions_view()}</DropdownMenuItem
+		>
 		{#if isOwner}
 			<DropdownMenuItem onclick={handleDeleteTicket}>{m.tickets_actions_delete()}</DropdownMenuItem>
 		{/if}

@@ -3,15 +3,13 @@ import { z } from 'zod';
 import { zod as zodAdapter } from 'sveltekit-superforms/adapters';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
-import { UserRoleManager, UserRole } from '$lib/role-manager';
-import { zodEnum } from '$lib/utils';
+import { UserRole } from '$lib/role-manager';
 import type { TablesInsert } from '$lib/database.types';
 import { OAUTH_PROVIDERS } from '$lib/constants';
 import type { Provider } from '@supabase/supabase-js';
 import { ROUTES } from '$lib/constants';
 import { PUBLIC_DOMAIN } from '$env/static/public';
 
-const defaultRoles = UserRoleManager.getAllRolesExcept(UserRole.Admin);
 
 const SignUpSchema = z.object({
 	full_name: z
@@ -29,9 +27,6 @@ const SignUpSchema = z.object({
 			required_error: 'Password is required'
 		})
 		.min(6, { message: 'Password must be at least 6 characters' }),
-	role: z.enum(zodEnum(defaultRoles), {
-		message: 'Role is required'
-	})
 });
 
 export const actions: Actions = {
@@ -76,7 +71,7 @@ export const actions: Actions = {
 			return fail(400, { form });
 		}
 
-		const { email, password, role } = form.data;
+		const { email, password } = form.data;
 
 		const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
 			email,
@@ -107,14 +102,14 @@ export const actions: Actions = {
 			.insert<TablesInsert<'profiles'>>({
 				user_id: userId,
 				full_name: form.data.full_name,
-				role,
+				role: UserRole.User,
 			});
 
 		if (profileError) {
 			console.log('🚀 ~ signup: ~ profileError:', profileError);
 
 			form.errors = {
-				role: ['Account created, but profile setup failed. Please contact support.']
+				password: ['Account created, but profile setup failed. Please contact support.']
 			};
 
 			return fail(400, { form });

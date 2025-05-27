@@ -85,12 +85,39 @@ export const actions: Actions = {
 
 		const adminSupabase = createClient<Database>(PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
+		const { data: profile } = await adminSupabase
+			.from('profiles')
+			.select('id')
+			.eq('user_id', user.id)
+			.single();
+
+		if (profile) {
+			const { error: messagesError } = await adminSupabase
+				.from('messages')
+				.delete()
+				.eq('profile_id', profile.id);
+
+			if (messagesError) {
+				console.log('Messages deletion error:', messagesError);
+			}
+		}
+
+		const { error: profileError } = await adminSupabase
+			.from('profiles')
+			.delete()
+			.eq('user_id', user.id);
+
+		if (profileError) {
+			console.log('Profile deletion error:', profileError);
+		}
+
 		const { error: deleteError } = await adminSupabase.auth.admin.deleteUser(user.id, false);
 
 		if (deleteError) {
+			console.log('🚀 ~ deleteAccount: ~ deleteError:', deleteError);
 			throw error(500, 'Failed to delete account. Please, try again later');
 		}
 
-		redirect(303, ROUTES.auth.login);
+		throw redirect(303, ROUTES.auth.login);
 	}
 };

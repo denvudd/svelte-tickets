@@ -122,7 +122,7 @@
 								<div class="text-muted-foreground flex-none text-xs">
 									{chat.last_message?.created_at
 										? dayjs(chat.last_message.created_at, {
-												locale: languageTag() === "ua" ? uaLocale : undefined
+												locale: languageTag() === 'ua' ? (uaLocale as unknown as string) : undefined
 											}).fromNow()
 										: ''}
 								</div>

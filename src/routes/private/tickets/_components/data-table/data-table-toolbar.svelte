@@ -192,7 +192,6 @@
 			method="POST"
 			use:enhance={({ formElement, formData, action, cancel }) => {
 				return async ({ result }) => {
-					console.log('🚀 ~ return ~ result:', result);
 					if (result.status === 200) {
 						toast.success(m.tickets_delete_success());
 					} else {

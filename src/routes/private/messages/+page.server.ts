@@ -67,7 +67,6 @@ export const load: PageServerLoad = async ({
 	});
 
 	if (chatMembersError) {
-		console.log('🚀 ~ load: ~ chatMembersError:', chatMembersError);
 		return fail(500, { message: chatMembersError.message });
 	}
 

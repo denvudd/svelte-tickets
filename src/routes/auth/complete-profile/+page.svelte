@@ -49,38 +49,6 @@
 				/>
 			</div>
 
-			<div class="grid gap-2">
-				<Label for="role">{m.complete_profile_role_label()}</Label>
-				<RadioGroup name="role">
-					{#each USER_ROLES_DESCRIPTION() as { role, label, description }}
-						<div class="flex items-center space-x-2">
-							<RadioGroupItem value={role} id={role} />
-							<Label for={role} class="inline-flex items-center gap-2 font-normal">
-								{label}
-								<TooltipProvider delayDuration={100}>
-									<Tooltip>
-										<TooltipTrigger>
-											<InfoIcon class="size-3" />
-										</TooltipTrigger>
-										<TooltipContent class="max-w-xs">
-											<ul class="flex list-disc flex-col gap-1.5 pl-4">
-												{#each description as desc}
-													<li>{desc}</li>
-												{/each}
-											</ul>
-										</TooltipContent>
-									</Tooltip>
-								</TooltipProvider>
-							</Label>
-						</div>
-					{/each}
-					{#if errors.role}
-						<span class="animate-in fade-in-30 slide-in-from-top text-xs text-red-400"
-							>{errors.role}</span
-						>{/if}
-				</RadioGroup>
-			</div>
-
 			<Button type="submit" class="w-full">{m.complete_profile_button()}</Button>
 		</CardContent>
 	</Card>

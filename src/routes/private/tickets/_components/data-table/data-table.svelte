@@ -34,6 +34,7 @@
 	};
 
 	let { data, columns, totalCount, pageSize = 10 }: DataTableProps<TData, TValue> = $props();
+	$inspect('🚀 ~ data:', data);
 
 	const currentPage = page.url.searchParams.get('page')
 		? parseInt(page.url.searchParams.get('page') || '1') - 1
